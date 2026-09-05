@@ -1,0 +1,168 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_cv/view
+
+    Main template for mod_cv student view.
+}}
+<div class="mod-cv-container" id="mod_cv_app" data-cmid="{{cmid}}">
+
+    <!-- Header / Banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1">{{activityname}}</h2>
+            <p class="text-muted mb-0">{{#str}}header_subtitle, mod_cv{{/str}}</p>
+        </div>
+        <div>
+            <span class="cv-badge-exam">{{exam_title}}</span>
+        </div>
+    </div>
+
+    {{#intro}}
+        <div class="alert alert-info mb-4">
+            {{{intro}}}
+        </div>
+    {{/intro}}
+
+    <!-- Card 1: Course & Education Verification (Course-Aware) -->
+    <div class="cv-card">
+        <div class="cv-card-header">
+            <h4><i class="fa fa-graduation-cap text-primary"></i> {{#str}}step_course_title, mod_cv{{/str}}</h4>
+        </div>
+        <div class="cv-card-body">
+            <div class="cv-info-grid">
+                <div class="cv-info-item">
+                    <label>{{#str}}course_fullname, mod_cv{{/str}}</label>
+                    <span>{{course_name}}</span>
+                </div>
+                <div class="cv-info-item">
+                    <label>{{#str}}exam_type, mod_cv{{/str}}</label>
+                    <span>{{exam_title}}</span>
+                </div>
+                <div class="cv-info-item">
+                    <label>{{#str}}course_contact_hours, mod_cv{{/str}}</label>
+                    <span>{{contact_hours}} Hours</span>
+                </div>
+                <div class="cv-info-item">
+                    <label>{{#str}}course_provider, mod_cv{{/str}}</label>
+                    <span>{{provider_name}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="cv_input_form">
+        <!-- Card 2: Candidate Information -->
+        <div class="cv-card">
+            <div class="cv-card-header">
+                <h4><i class="fa fa-user text-primary"></i> {{#str}}step_personal_title, mod_cv{{/str}}</h4>
+            </div>
+            <div class="cv-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="candidate_name" class="form-label font-weight-bold">{{#str}}candidate_name, mod_cv{{/str}} *</label>
+                        <input type="text" class="form-control" id="candidate_name" name="name" value="{{candidate.name}}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="candidate_email" class="form-label font-weight-bold">{{#str}}candidate_email, mod_cv{{/str}} *</label>
+                        <input type="email" class="form-control" id="candidate_email" name="email" value="{{candidate.email}}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="candidate_phone" class="form-label font-weight-bold">{{#str}}candidate_phone, mod_cv{{/str}}</label>
+                        <input type="text" class="form-control" id="candidate_phone" name="phone" value="{{candidate.phone}}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="candidate_country" class="form-label font-weight-bold">{{#str}}candidate_country, mod_cv{{/str}}</label>
+                        <input type="text" class="form-control" id="candidate_country" name="country" value="{{candidate.country}}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="degree_level" class="form-label font-weight-bold">{{#str}}degree_level, mod_cv{{/str}} *</label>
+                        <select class="form-select custom-select" id="degree_level" name="degree">
+                            <option value="bachelors" {{#degree_is_bachelors}}selected{{/degree_is_bachelors}}>{{#str}}degree_bachelors, mod_cv{{/str}}</option>
+                            <option value="secondary" {{#degree_is_secondary}}selected{{/degree_is_secondary}}>{{#str}}degree_secondary, mod_cv{{/str}}</option>
+                            <option value="postgrad" {{#degree_is_postgrad}}selected{{/degree_is_postgrad}}>{{#str}}degree_postgrad, mod_cv{{/str}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Project Experience -->
+        <div class="cv-card">
+            <div class="cv-card-header">
+                <h4><i class="fa fa-briefcase text-primary"></i> {{#str}}step_projects_title, mod_cv{{/str}}</h4>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btn_add_project">
+                    <i class="fa fa-plus"></i> {{#str}}btn_add_project, mod_cv{{/str}}
+                </button>
+            </div>
+            <div class="cv-card-body">
+                <p class="text-muted">{{#str}}step_projects_desc, mod_cv{{/str}}</p>
+
+                <div id="projects_container">
+                    <!-- Project cards will be injected dynamically or rendered from pre-saved projects -->
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-primary" id="btn_add_project_bottom">
+                        <i class="fa fa-plus"></i> {{#str}}btn_add_project, mod_cv{{/str}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Actions & AI Generation -->
+        <div class="cv-card">
+            <div class="cv-card-body text-center py-4">
+                <div id="cv_loading_indicator" class="cv-loading-overlay mb-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2 font-weight-bold text-primary">{{#str}}generating_message, mod_cv{{/str}}</p>
+                </div>
+
+                <div id="cv_error_alert" class="alert alert-danger d-none text-left" role="alert"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" id="btn_submit_ai">
+                    <i class="fa fa-magic"></i> {{#str}}btn_generate_ai, mod_cv{{/str}}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Card 5: Review & Download Section -->
+    <div id="cv_review_section" class="cv-card {{^has_output}}d-none{{/has_output}}">
+        <div class="cv-card-header">
+            <h4><i class="fa fa-check-circle text-success"></i> {{#str}}preview_heading, mod_cv{{/str}}</h4>
+            <a href="{{export_url}}" class="btn btn-success btn-sm" id="btn_export_pdf" target="_blank">
+                <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
+            </a>
+        </div>
+        <div class="cv-card-body">
+            <div id="cv_output_display">
+                <!-- Rendered output -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Pass initial data to JavaScript -->
+<script type="application/json" id="mod_cv_initial_data">
+    {{{initial_data_json}}}
+</script>

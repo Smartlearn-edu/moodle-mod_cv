@@ -1,0 +1,70 @@
+{
+  "name": "PMI Application AI Assistant (mod_cv)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mod-cv-process",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook Receiver",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare prompt based on received Moodle mod_cv payload\nconst body = $input.item.json.body || $input.item.json;\nconst exam = body.exam || { type: 'PMP', contact_hours: 35 };\nconst candidate = body.candidate || {};\nconst projects = body.projects || [];\n\nconst systemPrompt = `You are a certified PMI Application Specialist and PMBOK expert.\nYour goal is to format candidate project experience into official PMI application descriptions for ${exam.type.toUpperCase()}.\n\nRules:\n1. Use first-person singular ('I led', 'I managed', 'I directed'). Never use third-person.\n2. Structure each project description strictly into:\n   - Objective: (1-2 sentences on project purpose and business goal)\n   - Outcome: (1-2 sentences on project result and deliverables handed over)\n   - Role: (1 sentence on your leadership role)\n   - Responsibilities: Initiating (charter, stakeholders), Planning (WBS, schedule, budget, risks), Executing (team leadership, deliverables), Monitoring & Controlling (EVM, KPIs, change management), Closing (lessons learned, project closure).\n3. Keep word count strictly between 200 and 450 words per project.\n4. Avoid operational/routine wording. Align with PMBOK Guide terminology.\n5. Output must be strictly valid JSON without markdown wrapping.`;\n\nconst userPrompt = `Candidate Name: ${candidate.name}\\nTarget Certification: ${exam.type}\\nContact Hours: ${exam.contact_hours}\\n\\nProjects to format:\\n` + JSON.stringify(projects, null, 2);\n\nreturn [{\n  json: {\n    systemPrompt,\n    userPrompt,\n    originalData: body\n  }\n}];"
+      },
+      "name": "Format Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"summary\": \"Certified professional with comprehensive project leadership experience aligned with \" + ($json.originalData.exam.type ? $json.originalData.exam.type.toUpperCase() : 'PMI') + \" standards and \" + ($json.originalData.exam.contact_hours || 35) + \" hours of formal education.\",\n  \"projects\": $json.originalData.projects.map((p, i) => ({\n    \"title\": p.title,\n    \"role\": p.role,\n    \"methodology\": p.methodology,\n    \"formatted_description\": \"IN: Identified key stakeholders and developed the project charter for \" + p.title + \".\\nPL: Created the Work Breakdown Structure (WBS), risk register, and schedule.\\nEX: Directed cross-functional team execution and managed resource allocation.\\nMC: Monitored KPIs, managed change requests, and tracked budget variance.\\nCL: Facilitated formal lessons-learned workshop and closed administrative procurements.\\nOutcome: Successfully delivered deliverables meeting baseline requirements.\"\n  }))\n}",
+        "options": {}
+      },
+      "name": "Respond to Moodle",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Receiver": {
+      "main": [
+        [
+          {
+            "node": "Format Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Prompt": {
+      "main": [
+        [
+          {
+            "node": "Respond to Moodle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
