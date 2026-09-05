@@ -67,7 +67,7 @@ class n8n_client {
         $httpstatus = (int) ($info['http_code'] ?? 0);
         if ($httpstatus < 200 || $httpstatus >= 300) {
             $errormsg = 'n8n HTTP Error ' . $httpstatus . ': ' . ($curl->error ?? $rawresponse);
-            throw new moodle_exception('error_n8n_request', 'mod_cv', '', null, $errormsg);
+            throw new moodle_exception('error_n8n_request', 'mod_cv', '', $errormsg, $errormsg);
         }
 
         $clean = trim($rawresponse ?? '');

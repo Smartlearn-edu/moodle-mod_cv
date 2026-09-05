@@ -33,4 +33,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/cv:submit',
     ],
+    'mod_cv_check_status' => [
+        'classname' => 'mod_cv\external\check_status',
+        'methodname' => 'execute',
+        'description' => 'Check asynchronous processing status of a CV submission',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/cv:view',
+    ],
 ];

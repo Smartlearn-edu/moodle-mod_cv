@@ -99,9 +99,36 @@ class submit extends external_api {
 
         $authtoken = get_config('mod_cv', 'default_auth_token');
 
+        $now = time();
+        $rawjson = json_encode(['profile' => $params['profile'], 'projects' => $params['projects']]);
+
+        $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
+        if ($submission) {
+            $submission->raw_input = $rawjson;
+            $submission->status = 'pending';
+            $submission->timemodified = $now;
+            $DB->update_record('cv_submissions', $submission);
+        } else {
+            $submission = new \stdClass();
+            $submission->cvid = $cv->id;
+            $submission->userid = $USER->id;
+            $submission->raw_input = $rawjson;
+            $submission->ai_output = '';
+            $submission->status = 'pending';
+            $submission->timecreated = $now;
+            $submission->timemodified = $now;
+            $submission->id = $DB->insert_record('cv_submissions', $submission);
+        }
+
+        $callbackurl = (new \moodle_url('/mod/cv/callback.php'))->out(false);
+
         // Construct payload for n8n.
         $payload = [
+            'submission_id' => (int) $submission->id,
+            'callback_url' => $callbackurl,
             'token' => $authtoken,
+            'cmid' => (int) $cm->id,
+            'userid' => (int) $USER->id,
             'exam' => [
                 'type' => $cv->examtype,
                 'contact_hours' => (int) $cv->contacthours,
@@ -119,33 +146,22 @@ class submit extends external_api {
         // Send to n8n webhook.
         $airesponse = \mod_cv\n8n_client::send($webhookurl, $payload, $authtoken);
 
-        // Save submission to database.
-        $now = time();
-        $rawjson = json_encode(['profile' => $params['profile'], 'projects' => $params['projects']]);
-        $outputjson = json_encode($airesponse, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        // Check if n8n returned immediate synchronous output or asynchronous acknowledgment.
+        $iscompleted = false;
+        $outputjson = '';
 
-        $existing = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
-        if ($existing) {
-            $existing->raw_input = $rawjson;
-            $existing->ai_output = $outputjson;
-            $existing->status = 'processed';
-            $existing->timemodified = $now;
-            $DB->update_record('cv_submissions', $existing);
-        } else {
-            $record = new \stdClass();
-            $record->cvid = $cv->id;
-            $record->userid = $USER->id;
-            $record->raw_input = $rawjson;
-            $record->ai_output = $outputjson;
-            $record->status = 'processed';
-            $record->timecreated = $now;
-            $record->timemodified = $now;
-            $DB->insert_record('cv_submissions', $record);
+        if (!empty($airesponse['summary']) || !empty($airesponse['projects'])) {
+            $iscompleted = true;
+            $outputjson = json_encode($airesponse, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $submission->ai_output = $outputjson;
+            $submission->status = 'completed';
+            $submission->timemodified = time();
+            $DB->update_record('cv_submissions', $submission);
         }
 
         return [
             'status' => true,
-            'message' => get_string('status_saved', 'mod_cv'),
+            'message' => $iscompleted ? get_string('status_saved', 'mod_cv') : get_string('status_pending', 'mod_cv'),
             'outputjson' => $outputjson,
         ];
     }

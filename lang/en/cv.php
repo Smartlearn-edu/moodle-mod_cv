@@ -28,6 +28,7 @@ $string['pluginname'] = 'PMI Application & CV Builder';
 $string['modulename'] = 'PMI Application & CV Builder';
 $string['modulenameplural'] = 'PMI Application & CV Builders';
 $string['modulename_help'] = 'The PMI Application & CV Builder helps students assemble their certification application project experience, process it with AI via an n8n webhook, review the formatted application, and export a clean PDF.';
+$string['pluginadministration'] = 'PMI Application & CV Builder administration';
 $string['cv:addinstance'] = 'Add a new PMI Application & CV Builder activity';
 $string['cv:view'] = 'View PMI Application & CV Builder';
 $string['cv:submit'] = 'Submit data for AI processing';
@@ -43,6 +44,7 @@ $string['default_auth_token_desc'] = 'Optional Bearer token or secret to pass in
 // Activity settings form.
 $string['activity_settings'] = 'Exam & Certification Configuration';
 $string['exam_type'] = 'Target PMI Certification';
+$string['exam_type_help'] = 'Select the certification this course prepares the student for.';
 $string['exam_type_desc'] = 'Select the certification this course prepares the student for.';
 $string['exam_pmp'] = 'PMP® - Project Management Professional';
 $string['exam_capm'] = 'CAPM® - Certified Associate in Project Management';
@@ -106,6 +108,10 @@ $string['preview_heading'] = 'AI-Formatted Application Review';
 $string['summary_heading'] = 'Executive Summary';
 $string['no_projects_added'] = 'Please add at least one project before processing.';
 $string['status_saved'] = 'Draft saved successfully.';
+$string['status_pending'] = 'Your application has been dispatched to n8n and is being processed in the background.';
+$string['error_no_webhook'] = 'No n8n webhook URL is configured. Please configure it in the activity settings or site administration.';
+$string['error_n8n_request'] = 'n8n communication error: {$a}';
+$string['error_no_output_to_export'] = 'No processed application data available to export. Please generate with AI first.';
 
 // Privacy strings.
 $string['privacy:metadata:cv_submissions'] = 'Stores candidate project experience and AI-processed CV/application data.';

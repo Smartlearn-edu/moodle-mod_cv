@@ -82,6 +82,9 @@ $examtitles = [
 ];
 $examtitle = $examtitles[$cv->examtype] ?? strtoupper($cv->examtype);
 
+$status = $submission ? $submission->status : 'draft';
+$ispending = ($status === 'pending');
+
 $templatedata = [
     'cmid' => $cm->id,
     'activityname' => format_string($cv->name),
@@ -95,10 +98,12 @@ $templatedata = [
     'degree_is_secondary' => ($degree === 'secondary'),
     'degree_is_postgrad' => ($degree === 'postgrad'),
     'has_output' => !empty($aioutput),
+    'is_pending' => $ispending,
     'export_url' => (new moodle_url('/mod/cv/export.php', ['id' => $cm->id]))->out(false),
     'initial_data_json' => json_encode([
         'saved_projects' => $savedprojects,
         'ai_output' => $aioutput,
+        'status' => $status,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 ];
 

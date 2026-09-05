@@ -160,6 +160,63 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
     }
 
+    var pollTimer = null;
+
+    /**
+     * Poll status for asynchronous processing.
+     *
+     * @param {Number} cmid
+     */
+    function startPolling(cmid) {
+        if (pollTimer) {
+            clearTimeout(pollTimer);
+        }
+
+        var loadingIndicator = document.getElementById('cv_loading_indicator');
+        var submitBtn = document.getElementById('btn_submit_ai');
+        if (loadingIndicator) {
+            loadingIndicator.classList.add('active');
+        }
+        if (submitBtn) {
+            submitBtn.disabled = true;
+        }
+
+        function check() {
+            ajax.call([{
+                methodname: 'mod_cv_check_status',
+                args: { cmid: cmid }
+            }])[0].then(function(res) {
+                if (res.has_output && res.outputjson) {
+                    if (loadingIndicator) {
+                        loadingIndicator.classList.remove('active');
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                    try {
+                        var parsed = JSON.parse(res.outputjson);
+                        renderAiOutput(parsed);
+                    } catch (e) {
+                        // Ignore parse error.
+                    }
+                } else if (res.status === 'pending') {
+                    pollTimer = setTimeout(check, 4000);
+                } else {
+                    if (loadingIndicator) {
+                        loadingIndicator.classList.remove('active');
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                }
+            }).catch(function() {
+                pollTimer = setTimeout(check, 5000);
+            });
+        }
+
+        check();
+    }
+
     return {
         /**
          * Initialize the mod_cv application.
@@ -190,6 +247,11 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             // Render existing AI output if already processed.
             if (initialData.ai_output) {
                 renderAiOutput(initialData.ai_output);
+            }
+
+            // If already pending from a previous asynchronous request, resume polling.
+            if (initialData.status === 'pending') {
+                startPolling(cmid);
             }
 
             // Add Project button listeners.
@@ -309,20 +371,28 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                             projects: projects
                         }
                     }])[0].then(function(res) {
-                        loadingIndicator.classList.remove('active');
-                        submitBtn.disabled = false;
-
                         if (res.status && res.outputjson) {
+                            loadingIndicator.classList.remove('active');
+                            submitBtn.disabled = false;
                             var parsed = JSON.parse(res.outputjson);
                             renderAiOutput(parsed);
+                        } else if (res.status) {
+                            // Asynchronous background processing: start polling.
+                            startPolling(cmid);
                         } else {
+                            loadingIndicator.classList.remove('active');
+                            submitBtn.disabled = false;
                             errorAlert.textContent = res.message || 'Error communicating with n8n.';
                             errorAlert.classList.remove('d-none');
                         }
                     }).catch(function(err) {
                         loadingIndicator.classList.remove('active');
                         submitBtn.disabled = false;
-                        errorAlert.textContent = err.message || 'Error occurred while processing request.';
+                        var msg = err.message || err.error || 'Error occurred while processing request.';
+                        if (err.debuginfo && err.debuginfo !== msg) {
+                            msg += ' (' + err.debuginfo + ')';
+                        }
+                        errorAlert.textContent = msg;
                         errorAlert.classList.remove('d-none');
                     });
                 });
