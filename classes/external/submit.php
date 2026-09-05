@@ -101,6 +101,7 @@ class submit extends external_api {
 
         // Construct payload for n8n.
         $payload = [
+            'token' => $authtoken,
             'exam' => [
                 'type' => $cv->examtype,
                 'contact_hours' => (int) $cv->contacthours,

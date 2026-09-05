@@ -63,17 +63,23 @@ class n8n_client {
         $jsonpayload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $rawresponse = $curl->post($webhookurl, $jsonpayload);
 
-        $httpstatus = $curl->info['http_code'] ?? 0;
+        $info = $curl->get_info();
+        $httpstatus = (int) ($info['http_code'] ?? 0);
         if ($httpstatus < 200 || $httpstatus >= 300) {
             $errormsg = 'n8n HTTP Error ' . $httpstatus . ': ' . ($curl->error ?? $rawresponse);
             throw new moodle_exception('error_n8n_request', 'mod_cv', '', null, $errormsg);
         }
 
-        $decoded = json_decode($rawresponse, true);
-        if ($decoded === null && !empty($rawresponse)) {
-            // Check if n8n returned a wrapped string or text.
+        $clean = trim($rawresponse ?? '');
+        // Unwrap markdown code blocks if the LLM wrapped the JSON in ```json ... ```.
+        if (preg_match('/^```(?:json)?\s*([\s\S]*?)\s*```$/i', $clean, $matches)) {
+            $clean = trim($matches[1]);
+        }
+
+        $decoded = json_decode($clean, true);
+        if ($decoded === null && !empty($clean)) {
             return [
-                'summary' => $rawresponse,
+                'summary' => $clean,
                 'projects' => [],
             ];
         }
