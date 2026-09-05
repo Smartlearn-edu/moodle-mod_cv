@@ -174,11 +174,21 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
         var loadingIndicator = document.getElementById('cv_loading_indicator');
         var submitBtn = document.getElementById('btn_submit_ai');
+        var infoAlert = document.getElementById('cv_info_alert');
+        var errorAlert = document.getElementById('cv_error_alert');
+
         if (loadingIndicator) {
             loadingIndicator.classList.add('active');
         }
         if (submitBtn) {
             submitBtn.disabled = true;
+        }
+        if (errorAlert) {
+            errorAlert.classList.add('d-none');
+        }
+        if (infoAlert) {
+            infoAlert.innerHTML = '<i class="fa fa-info-circle"></i> Your application is being processed by AI in the background. Please wait...';
+            infoAlert.classList.remove('d-none');
         }
 
         function check() {
@@ -192,6 +202,9 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     }
                     if (submitBtn) {
                         submitBtn.disabled = false;
+                    }
+                    if (infoAlert) {
+                        infoAlert.classList.add('d-none');
                     }
                     try {
                         var parsed = JSON.parse(res.outputjson);
@@ -207,6 +220,9 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     }
                     if (submitBtn) {
                         submitBtn.disabled = false;
+                    }
+                    if (infoAlert) {
+                        infoAlert.classList.add('d-none');
                     }
                 }
             }).catch(function() {
