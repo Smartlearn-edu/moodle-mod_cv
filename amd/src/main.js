@@ -242,7 +242,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     '<div class="cv-output-header">' +
                     '   <h5 class="mb-0 font-weight-bold text-dark"><i class="fa fa-check-square text-success"></i> ' + escapeHtml(proj.title || ('Project #' + (i + 1))) + '</h5>' +
                     '   <button type="button" class="btn btn-outline-secondary btn-sm cv-copy-btn" data-copy-target="#' + pId + '">' +
-                    '       <i class="fa fa-clipboard"></i> Copy for PMI.org' +
+                    '       <i class="fa fa-clipboard"></i> Copy' +
                     '   </button>' +
                     '</div>' +
                     (proj.role ? '<p class="text-muted small mb-2"><strong>Role:</strong> ' + escapeHtml(proj.role) + '</p>' : '') +
@@ -442,6 +442,26 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 }
             });
 
+            // Course selector listener to auto-populate dates.
+            var courseSelector = document.getElementById('course_selector');
+            if (courseSelector) {
+                courseSelector.addEventListener('change', function() {
+                    var selectedOption = courseSelector.options[courseSelector.selectedIndex];
+                    if (selectedOption) {
+                        var sDate = selectedOption.getAttribute('data-startdate') || '';
+                        var eDate = selectedOption.getAttribute('data-enddate') || '';
+                        var startInput = document.getElementById('course_startdate');
+                        var endInput = document.getElementById('course_enddate');
+                        if (startInput && sDate) {
+                            startInput.value = sDate;
+                        }
+                        if (endInput && eDate) {
+                            endInput.value = eDate;
+                        }
+                    }
+                });
+            }
+
             // Form submission.
             var form = document.getElementById('cv_input_form');
             if (form) {
@@ -456,12 +476,59 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     errorAlert.textContent = '';
 
                     // Collect candidate profile.
+                    var instEl = document.getElementById('degree_institution');
+                    var degreeStartEl = document.getElementById('degree_startdate');
+                    var degreeEndEl = document.getElementById('degree_enddate');
+
                     var profile = {
                         name: document.getElementById('candidate_name').value.trim(),
                         email: document.getElementById('candidate_email').value.trim(),
                         phone: document.getElementById('candidate_phone').value.trim(),
                         country: document.getElementById('candidate_country').value.trim(),
-                        degree: document.getElementById('degree_level').value
+                        degree: document.getElementById('degree_level').value,
+                        institution: instEl ? instEl.value.trim() : '',
+                        degree_startdate: degreeStartEl ? degreeStartEl.value.trim() : '',
+                        degree_enddate: degreeEndEl ? degreeEndEl.value.trim() : ''
+                    };
+
+                    if (!profile.name || !profile.email || !profile.institution ||
+                        !profile.degree_startdate || !profile.degree_enddate) {
+                        errorAlert.textContent = 'Please complete all required fields (*) in Candidate Information.';
+                        errorAlert.classList.remove('d-none');
+                        if (instEl) {
+                            instEl.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        return;
+                    }
+
+                    // Collect course info.
+                    var cSelector = document.getElementById('course_selector');
+                    var courseStartEl = document.getElementById('course_startdate');
+                    var courseEndEl = document.getElementById('course_enddate');
+
+                    var courseId = cSelector ? parseInt(cSelector.value, 10) || 0 : 0;
+                    var courseName = '';
+                    if (cSelector && cSelector.selectedIndex >= 0) {
+                        var opt = cSelector.options[cSelector.selectedIndex];
+                        courseName = opt.getAttribute('data-fullname') || opt.text || '';
+                    }
+                    var courseStartDate = courseStartEl ? courseStartEl.value.trim() : '';
+                    var courseEndDate = courseEndEl ? courseEndEl.value.trim() : '';
+
+                    if (!courseStartDate || !courseEndDate) {
+                        errorAlert.textContent = 'Please provide both start and end dates for the course.';
+                        errorAlert.classList.remove('d-none');
+                        if (courseStartEl) {
+                            courseStartEl.scrollIntoView({ behavior: 'smooth' });
+                        }
+                        return;
+                    }
+
+                    var courseInfo = {
+                        id: courseId,
+                        name: courseName,
+                        startdate: courseStartDate,
+                        enddate: courseEndDate
                     };
 
                     // Collect project cards.
@@ -540,6 +607,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                         args: {
                             cmid: cmid,
                             profile: profile,
+                            course_info: courseInfo,
                             projects: projects
                         }
                     }])[0].then(function(res) {

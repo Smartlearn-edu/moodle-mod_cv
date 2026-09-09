@@ -46,7 +46,16 @@ class submit extends external_api {
                 'phone' => new external_value(PARAM_TEXT, 'Candidate phone', VALUE_DEFAULT, ''),
                 'country' => new external_value(PARAM_TEXT, 'Candidate country', VALUE_DEFAULT, ''),
                 'degree' => new external_value(PARAM_ALPHAEXT, 'Education degree level', VALUE_DEFAULT, 'bachelors'),
+                'institution' => new external_value(PARAM_TEXT, 'College/University/Institution name', VALUE_DEFAULT, ''),
+                'degree_startdate' => new external_value(PARAM_TEXT, 'Degree start date', VALUE_DEFAULT, ''),
+                'degree_enddate' => new external_value(PARAM_TEXT, 'Degree end/graduation date', VALUE_DEFAULT, ''),
             ]),
+            'course_info' => new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'Course ID', VALUE_DEFAULT, 0),
+                'name' => new external_value(PARAM_TEXT, 'Course title/fullname', VALUE_DEFAULT, ''),
+                'startdate' => new external_value(PARAM_TEXT, 'Course start date', VALUE_DEFAULT, ''),
+                'enddate' => new external_value(PARAM_TEXT, 'Course end/completion date', VALUE_DEFAULT, ''),
+            ], 'Course information', VALUE_DEFAULT, []),
             'projects' => new external_multiple_structure(
                 new external_single_structure([
                     'title' => new external_value(PARAM_TEXT, 'Project title/name'),
@@ -87,15 +96,17 @@ class submit extends external_api {
      * @param int $cmid
      * @param array $profile
      * @param array $projects
+     * @param array $course_info
      * @return array
      */
-    public static function execute(int $cmid, array $profile, array $projects): array {
+    public static function execute(int $cmid, array $profile, array $projects, array $course_info = []): array {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'cmid' => $cmid,
             'profile' => $profile,
             'projects' => $projects,
+            'course_info' => $course_info,
         ]);
 
         $cm = get_coursemodule_from_id('cv', $params['cmid'], 0, false, MUST_EXIST);
@@ -115,7 +126,19 @@ class submit extends external_api {
         $authtoken = get_config('mod_cv', 'default_auth_token');
 
         $now = time();
-        $rawjson = json_encode(['profile' => $params['profile'], 'projects' => $params['projects']]);
+
+        $coursedata = !empty($params['course_info']['name']) ? $params['course_info'] : [
+            'id' => (int) $course->id,
+            'name' => $course->fullname,
+            'startdate' => '',
+            'enddate' => '',
+        ];
+
+        $rawjson = json_encode([
+            'profile' => $params['profile'],
+            'course' => $coursedata,
+            'projects' => $params['projects'],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
         if ($submission) {
@@ -155,9 +178,11 @@ class submit extends external_api {
                 'provider' => $cv->providername ?? 'SmartLearn Education',
             ],
             'course' => [
-                'id' => (int) $course->id,
-                'fullname' => $course->fullname,
+                'id' => (int) ($coursedata['id'] ?: $course->id),
+                'fullname' => $coursedata['name'] ?: $course->fullname,
                 'shortname' => $course->shortname,
+                'startdate' => $coursedata['startdate'] ?? '',
+                'enddate' => $coursedata['enddate'] ?? '',
             ],
             'candidate' => $params['profile'],
             'projects' => $params['projects'],

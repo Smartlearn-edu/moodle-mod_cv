@@ -49,6 +49,9 @@ $profile = $rawinput['profile'] ?? [
     'phone' => '',
     'country' => '',
     'degree' => 'bachelors',
+    'institution' => '',
+    'degree_startdate' => '',
+    'degree_enddate' => '',
 ];
 
 $examtitles = [
@@ -65,7 +68,7 @@ $providername = !empty($cv->providername) ? $cv->providername : 'SmartLearn Educ
 
 // Initialize Moodle PDF generator (TCPDF).
 $pdf = new pdf();
-$pdf->SetTitle('PMI Application - ' . $profile['name']);
+$pdf->SetTitle('Application Dossier - ' . $profile['name']);
 $pdf->SetAuthor($profile['name']);
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(true);
@@ -86,7 +89,7 @@ $html = '<style>
     .project-card { border: 1px solid #cbd5e1; padding: 10px; margin-bottom: 14px; background-color: #ffffff; }
 </style>';
 
-$html .= '<h1>PMI® Application & Project Experience Dossier</h1>';
+$html .= '<h1>Application & Project Experience Dossier</h1>';
 $html .= '<p style="color: #64748b; font-size: 9pt;">Official Candidate Project Experience Record for ' . htmlspecialchars($examtitle) . '</p>';
 
 // Candidate Section.
@@ -101,12 +104,45 @@ if (!empty($profile['country'])) {
     $html .= '<tr><td class="label">Country:</td><td>' . htmlspecialchars($profile['country']) . '</td></tr>';
 }
 $html .= '<tr><td class="label">Highest Education Level:</td><td>' . htmlspecialchars(ucfirst($profile['degree'] ?? 'bachelors')) . '</td></tr>';
+if (!empty($profile['institution'])) {
+    $html .= '<tr><td class="label">Institution / University:</td><td>' . htmlspecialchars($profile['institution']) . '</td></tr>';
+}
+if (!empty($profile['degree_startdate']) || !empty($profile['degree_enddate'])) {
+    $degstart = $profile['degree_startdate'] ?? '';
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degstart, $m)) {
+        $degstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+    }
+    $degend = $profile['degree_enddate'] ?? '';
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degend, $m)) {
+        $degend = $m[3] . '/' . $m[2] . '/' . $m[1];
+    }
+    $degdates = trim($degstart . ($degend ? ' to ' . $degend : ''));
+    if (!empty($degdates)) {
+        $html .= '<tr><td class="label">Degree Dates / Graduation:</td><td>' . htmlspecialchars($degdates) . '</td></tr>';
+    }
+}
 $html .= '</table>';
 
 // Education Section.
+$savedcourse = $rawinput['course'] ?? [];
+$coursename = !empty($savedcourse['name']) ? $savedcourse['name'] : $course->fullname;
 $html .= '<h2>2. Qualifying Course & Professional Education</h2>';
 $html .= '<table class="table-info">';
-$html .= '<tr><td class="label">Course Title:</td><td>' . htmlspecialchars($course->fullname) . '</td></tr>';
+$html .= '<tr><td class="label">Course Title:</td><td>' . htmlspecialchars($coursename) . '</td></tr>';
+if (!empty($savedcourse['startdate']) || !empty($savedcourse['enddate'])) {
+    $cstart = $savedcourse['startdate'] ?? '';
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cstart, $m)) {
+        $cstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+    }
+    $cend = $savedcourse['enddate'] ?? '';
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cend, $m)) {
+        $cend = $m[3] . '/' . $m[2] . '/' . $m[1];
+    }
+    $cdates = trim($cstart . ($cend ? ' to ' . $cend : ''));
+    if (!empty($cdates)) {
+        $html .= '<tr><td class="label">Course Dates:</td><td>' . htmlspecialchars($cdates) . '</td></tr>';
+    }
+}
 $html .= '<tr><td class="label">Target Certification:</td><td>' . htmlspecialchars($examtitle) . '</td></tr>';
 $html .= '<tr><td class="label">Qualifying Contact Hours:</td><td>' . htmlspecialchars($cv->contacthours) . ' Hours</td></tr>';
 $html .= '<tr><td class="label">Education Provider:</td><td>' . htmlspecialchars($providername) . '</td></tr>';
@@ -119,7 +155,7 @@ if (!empty($aioutput['summary'])) {
 }
 
 // Project Experience.
-$html .= '<h2>4. Project Experience Write-Ups (PMI Format)</h2>';
+$html .= '<h2>4. Project Experience Write-Ups</h2>';
 $savedprojects = $rawinput['projects'] ?? [];
 
 if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {
@@ -175,7 +211,7 @@ if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {
 
 $pdf->writeHTML($html, true, false, true, false, '');
 
-$sanitizedName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $profile['name']);
-$filename = 'PMI_Application_' . $sanitizedName . '.pdf';
+$sanitizedname = preg_replace('/[^A-Za-z0-9_\-]/', '_', $profile['name']);
+$filename = 'Application_Dossier_' . $sanitizedname . '.pdf';
 $pdf->Output($filename, 'D');
 exit();

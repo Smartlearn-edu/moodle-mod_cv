@@ -76,9 +76,19 @@ $string['degree_level'] = 'أعلى مؤهل أكاديمي';
 $string['degree_secondary'] = 'شهادة ثانوية (أو دبلوم متوسط)';
 $string['degree_bachelors'] = 'شهادة جامعية 4 سنوات (بكالوريوس أو ما يعادلها)';
 $string['degree_postgrad'] = 'دراسات عليا (ماجستير أو دكتوراه)';
+$string['degree_institution'] = 'اسم الكلية / المعهد / الجامعة';
+$string['degree_institution_placeholder'] = 'مثال: كلية الهندسة / جامعة القاهرة';
+$string['degree_startdate'] = 'تاريخ بدء المؤهل';
+$string['degree_enddate'] = 'تاريخ التخرج (انتهاء المؤهل)';
 
 $string['step_course_title'] = '2. بيانات التعليم والدورة المؤهلة (Qualifying Course Education)';
+$string['select_course'] = 'الدورة التدريبية المؤهلة';
+$string['current_course'] = 'الدورة الحالية';
+$string['course_completed'] = 'مكتملة';
 $string['course_fullname'] = 'اسم الدورة التدريبية';
+$string['course_dates'] = 'تواريخ الدورة التدريبية';
+$string['course_startdate'] = 'تاريخ بدء الدورة';
+$string['course_enddate'] = 'تاريخ انتهاء الدورة';
 $string['course_contact_hours'] = 'ساعات الاتصال';
 $string['course_provider'] = 'الجهة المزودة للتعليم';
 

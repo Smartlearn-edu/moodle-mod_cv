@@ -73,6 +73,22 @@
                         </select>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="degree_institution" class="form-label font-weight-bold">{{#str}}degree_institution, mod_cv{{/str}} *</label>
+                        <input type="text" class="form-control" id="degree_institution" name="institution" value="{{candidate.institution}}" required placeholder="{{#str}}degree_institution_placeholder, mod_cv{{/str}}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="degree_startdate" class="form-label font-weight-bold">{{#str}}degree_startdate, mod_cv{{/str}} *</label>
+                        <input type="date" class="form-control" id="degree_startdate" name="degree_startdate" value="{{candidate.degree_startdate}}" required>
+                        <small class="form-text text-muted">Day, Month, Year</small>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="degree_enddate" class="form-label font-weight-bold">{{#str}}degree_enddate, mod_cv{{/str}} *</label>
+                        <input type="date" class="form-control" id="degree_enddate" name="degree_enddate" value="{{candidate.degree_enddate}}" required>
+                        <small class="form-text text-muted">Graduation Date</small>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -82,11 +98,29 @@
                 <h4><i class="fa fa-graduation-cap text-primary"></i> {{#str}}step_course_title, mod_cv{{/str}}</h4>
             </div>
             <div class="cv-card-body">
-                <div class="cv-info-grid">
-                    <div class="cv-info-item">
-                        <label>{{#str}}course_fullname, mod_cv{{/str}}</label>
-                        <span>{{course_name}}</span>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="course_selector" class="form-label font-weight-bold">{{#str}}select_course, mod_cv{{/str}} *</label>
+                        <select class="form-select custom-select" id="course_selector" name="course_id">
+                            {{#courses_list}}
+                                <option value="{{id}}" data-fullname="{{fullname}}" data-startdate="{{startdate}}" data-enddate="{{enddate}}" {{#is_selected}}selected{{/is_selected}}>{{displayname}}</option>
+                            {{/courses_list}}
+                        </select>
                     </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="course_startdate" class="form-label font-weight-bold">{{#str}}course_startdate, mod_cv{{/str}} *</label>
+                        <input type="date" class="form-control" id="course_startdate" name="course_startdate" value="{{course_startdate}}" required>
+                        <small class="form-text text-muted">Day, Month, Year</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="course_enddate" class="form-label font-weight-bold">{{#str}}course_enddate, mod_cv{{/str}} *</label>
+                        <input type="date" class="form-control" id="course_enddate" name="course_enddate" value="{{course_enddate}}" required>
+                        <small class="form-text text-muted">Course Completion / End Date</small>
+                    </div>
+                </div>
+                <div class="cv-info-grid mt-2">
                     <div class="cv-info-item">
                         <label>{{#str}}exam_type, mod_cv{{/str}}</label>
                         <span>{{exam_title}}</span>

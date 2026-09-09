@@ -76,9 +76,19 @@ $string['degree_level'] = 'Highest Level of Academic Education';
 $string['degree_secondary'] = 'Secondary degree (high school diploma, associate’s degree)';
 $string['degree_bachelors'] = 'Four-year degree (bachelor’s degree or global equivalent)';
 $string['degree_postgrad'] = 'Postgraduate degree (master’s or doctorate)';
+$string['degree_institution'] = 'College / University / Institution Name';
+$string['degree_institution_placeholder'] = 'e.g. Faculty of Engineering / Cairo University';
+$string['degree_startdate'] = 'Degree Start Date';
+$string['degree_enddate'] = 'Graduation Date (Degree End Date)';
 
 $string['step_course_title'] = '2. Qualifying Course Education';
+$string['select_course'] = 'Qualifying Course';
+$string['current_course'] = 'Current Course';
+$string['course_completed'] = 'Completed';
 $string['course_fullname'] = 'Course Title';
+$string['course_dates'] = 'Course Dates';
+$string['course_startdate'] = 'Course Start Date';
+$string['course_enddate'] = 'Course End Date';
 $string['course_contact_hours'] = 'Contact Hours';
 $string['course_provider'] = 'Education Provider';
 
