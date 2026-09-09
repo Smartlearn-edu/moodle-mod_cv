@@ -49,18 +49,33 @@ class submit extends external_api {
             ]),
             'projects' => new external_multiple_structure(
                 new external_single_structure([
-                    'title' => new external_value(PARAM_TEXT, 'Project title'),
-                    'role' => new external_value(PARAM_TEXT, 'Role on project'),
+                    'title' => new external_value(PARAM_TEXT, 'Project title/name'),
+                    'industry' => new external_value(PARAM_TEXT, 'Project industry', VALUE_DEFAULT, ''),
+                    'organization' => new external_value(PARAM_TEXT, 'Organization name', VALUE_DEFAULT, ''),
+                    'jobtitle' => new external_value(PARAM_TEXT, 'Job title', VALUE_DEFAULT, ''),
+                    'role' => new external_value(PARAM_TEXT, 'Role on project', VALUE_DEFAULT, ''),
+                    'startdate' => new external_value(PARAM_TEXT, 'Start date (Day/Month/Year or YYYY-MM-DD)', VALUE_DEFAULT, ''),
+                    'enddate' => new external_value(PARAM_TEXT, 'End date (Day/Month/Year or YYYY-MM-DD)', VALUE_DEFAULT, ''),
+                    'iscurrent' => new external_value(PARAM_BOOL, 'Whether project is ongoing', VALUE_DEFAULT, false),
                     'methodology' => new external_value(
-                        PARAM_ALPHA,
+                        PARAM_TEXT,
                         'Methodology (predictive, agile, hybrid)',
                         VALUE_DEFAULT,
                         'predictive'
                     ),
-                    'startdate' => new external_value(PARAM_TEXT, 'Start date (MM/YYYY)'),
-                    'enddate' => new external_value(PARAM_TEXT, 'End date (MM/YYYY)', VALUE_DEFAULT, ''),
-                    'iscurrent' => new external_value(PARAM_BOOL, 'Whether project is ongoing', VALUE_DEFAULT, false),
-                    'notes' => new external_value(PARAM_RAW, 'Project raw tasks and notes'),
+                    'objective' => new external_value(PARAM_RAW, 'Project objective', VALUE_DEFAULT, ''),
+                    'scope' => new external_value(PARAM_RAW, 'Project scope', VALUE_DEFAULT, ''),
+                    'responsibilities' => new external_value(PARAM_RAW, 'My responsibilities', VALUE_DEFAULT, ''),
+                    'deliverables' => new external_value(PARAM_RAW, 'Key deliverables', VALUE_DEFAULT, ''),
+                    'stakeholders' => new external_value(PARAM_RAW, 'Stakeholders managed', VALUE_DEFAULT, ''),
+                    'teamresources' => new external_value(PARAM_RAW, 'Team and resources managed', VALUE_DEFAULT, ''),
+                    'challenges' => new external_value(PARAM_RAW, 'Challenges, risks, issues managed', VALUE_DEFAULT, ''),
+                    'changes' => new external_value(PARAM_RAW, 'Changes managed', VALUE_DEFAULT, ''),
+                    'outcomes' => new external_value(PARAM_RAW, 'Project outcomes', VALUE_DEFAULT, ''),
+                    'measurableresults' => new external_value(PARAM_RAW, 'Measurable results', VALUE_DEFAULT, ''),
+                    'closure' => new external_value(PARAM_RAW, 'Project closure / handover', VALUE_DEFAULT, ''),
+                    'additionalinfo' => new external_value(PARAM_RAW, 'Additional information', VALUE_DEFAULT, ''),
+                    'notes' => new external_value(PARAM_RAW, 'Legacy tasks and notes', VALUE_DEFAULT, ''),
                 ])
             ),
         ]);
@@ -122,6 +137,9 @@ class submit extends external_api {
 
         $callbackurl = (new \moodle_url('/mod/cv/callback.php'))->out(false);
 
+        $defaultprompt = get_config('mod_cv', 'default_prompt');
+        $prompt = !empty($cv->customprompt) ? $cv->customprompt : ($defaultprompt ?: '');
+
         // Construct payload for n8n.
         $payload = [
             'submission_id' => (int) $submission->id,
@@ -129,6 +147,8 @@ class submit extends external_api {
             'token' => $authtoken,
             'cmid' => (int) $cm->id,
             'userid' => (int) $USER->id,
+            'prompt' => $prompt,
+            'custom_prompt' => $prompt,
             'exam' => [
                 'type' => $cv->examtype,
                 'contact_hours' => (int) $cv->contacthours,

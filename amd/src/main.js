@@ -44,6 +44,34 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
     }
 
     /**
+     * Normalize date string to YYYY-MM-DD for HTML5 date inputs.
+     *
+     * @param {string} val
+     * @return {string}
+     */
+    function normalizeDateForInput(val) {
+        if (!val) {
+            return '';
+        }
+        val = String(val).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+            return val;
+        }
+        var m1 = val.match(/^(\d{1,2})\/(\d{4})$/);
+        if (m1) {
+            var mm = m1[1].length === 1 ? '0' + m1[1] : m1[1];
+            return m1[2] + '-' + mm + '-01';
+        }
+        var m2 = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (m2) {
+            var dd = m2[1].length === 1 ? '0' + m2[1] : m2[1];
+            var mm2 = m2[2].length === 1 ? '0' + m2[2] : m2[2];
+            return m2[3] + '-' + mm2 + '-' + dd;
+        }
+        return val;
+    }
+
+    /**
      * Add a project card to the container.
      *
      * @param {Object} data
@@ -55,46 +83,123 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
         var html = '<div class="cv-project-card" id="project_card_' + idx + '">' +
             '<div class="cv-project-header">' +
-            '   <h5 class="mb-0 text-secondary"><i class="fa fa-folder-open text-primary"></i> Project #' + idx + '</h5>' +
+            '   <h5 class="mb-0 text-dark font-weight-bold"><i class="fa fa-folder-open text-primary"></i> Project #' + idx + '</h5>' +
             '   <button type="button" class="btn btn-outline-danger btn-sm btn-remove-project" data-target="#project_card_' + idx + '">' +
             '       <i class="fa fa-trash"></i> Remove' +
             '   </button>' +
             '</div>' +
+
+            // 1. Basic Project Details
+            '<div class="cv-section-title"><i class="fa fa-id-card"></i> Basic Project Information</div>' +
             '<div class="row">' +
             '   <div class="col-md-6 mb-3">' +
-            '       <label class="form-label font-weight-bold">Project Title *</label>' +
-            '       <input type="text" class="form-control project-title" required value="' + escapeHtml(p.title || '') + '" placeholder="e.g. Core Banking System Upgrade">' +
+            '       <label class="form-label">Project Name <span class="text-danger">*</span></label>' +
+            '       <input type="text" class="form-control project-title" required value="' + escapeHtml(p.title || '') + '" placeholder="Enter project name">' +
             '   </div>' +
             '   <div class="col-md-6 mb-3">' +
-            '       <label class="form-label font-weight-bold">Your Role *</label>' +
-            '       <input type="text" class="form-control project-role" required value="' + escapeHtml(p.role || '') + '" placeholder="e.g. Project Manager / Scrum Master">' +
+            '       <label class="form-label">Industry <span class="text-danger">*</span></label>' +
+            '       <input type="text" class="form-control project-industry" required value="' + escapeHtml(p.industry || '') + '" placeholder="Ex.: Construction, IT, Healthcare">' +
             '   </div>' +
             '</div>' +
             '<div class="row">' +
-            '   <div class="col-md-4 mb-3">' +
-            '       <label class="form-label font-weight-bold">Methodology</label>' +
-            '       <select class="form-select custom-select project-methodology">' +
-            '           <option value="predictive"' + (p.methodology === 'predictive' ? ' selected' : '') + '>Predictive / Waterfall</option>' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Organization</label>' +
+            '       <input type="text" class="form-control project-organization" value="' + escapeHtml(p.organization || '') + '" placeholder="Enter organization name">' +
+            '   </div>' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Job Title <span class="text-danger">*</span></label>' +
+            '       <input type="text" class="form-control project-jobtitle" required value="' + escapeHtml(p.jobtitle || '') + '" placeholder="Ex.: Engineer, Manager, Analyst">' +
+            '   </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Project Role <span class="text-danger">*</span></label>' +
+            '       <input type="text" class="form-control project-role" required value="' + escapeHtml(p.role || '') + '" placeholder="Ex.: Project Manager, Project Lead, Coordinator">' +
+            '   </div>' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Project Approach / Methodology <span class="text-danger">*</span></label>' +
+            '       <select class="form-select custom-select project-methodology" required>' +
+            '           <option value="predictive"' + (p.methodology === 'predictive' ? ' selected' : '') + '>Predictive (Waterfall)</option>' +
             '           <option value="agile"' + (p.methodology === 'agile' ? ' selected' : '') + '>Agile</option>' +
             '           <option value="hybrid"' + (p.methodology === 'hybrid' ? ' selected' : '') + '>Hybrid</option>' +
             '       </select>' +
             '   </div>' +
-            '   <div class="col-md-4 mb-3">' +
-            '       <label class="form-label font-weight-bold">Start Date (MM/YYYY) *</label>' +
-            '       <input type="text" class="form-control project-startdate" required value="' + escapeHtml(p.startdate || '') + '" placeholder="01/2023">' +
+            '</div>' +
+
+            // 2. Timeline
+            '<div class="cv-section-title"><i class="fa fa-calendar"></i> Project Timeline</div>' +
+            '<div class="row">' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Project Start Date <span class="text-danger">*</span></label>' +
+            '       <input type="date" class="form-control project-startdate" required value="' + escapeHtml(normalizeDateForInput(p.startdate)) + '" placeholder="Enter start date">' +
+            '       <small class="form-text text-muted">Select Day, Month, and Year</small>' +
             '   </div>' +
-            '   <div class="col-md-4 mb-3">' +
-            '       <label class="form-label font-weight-bold">End Date (MM/YYYY)</label>' +
-            '       <input type="text" class="form-control project-enddate" value="' + escapeHtml(p.enddate || '') + '" placeholder="12/2023">' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Project End Date <span class="text-danger">*</span></label>' +
+            '       <input type="date" class="form-control project-enddate"' + (p.iscurrent ? ' disabled' : ' required') + ' value="' + escapeHtml(normalizeDateForInput(p.enddate)) + '" placeholder="Enter end date">' +
             '       <div class="form-check mt-1">' +
             '           <input class="form-check-input project-iscurrent" type="checkbox" id="iscurrent_' + idx + '"' + (p.iscurrent ? ' checked' : '') + '>' +
             '           <label class="form-check-label small text-muted" for="iscurrent_' + idx + '">Project is ongoing</label>' +
             '       </div>' +
             '   </div>' +
             '</div>' +
+
+            // 3. Core Experience & Deliverables
+            '<div class="cv-section-title"><i class="fa fa-tasks"></i> Core Project Experience & Deliverables</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Project Objective <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-objective" rows="2" required placeholder="Ex.: Improve efficiency, launch product">' + escapeHtml(p.objective || (p.notes ? p.notes : '')) + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Project Scope <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-scope" rows="2" required placeholder="Ex.: Major work & boundaries">' + escapeHtml(p.scope || '') + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">My Responsibilities <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-responsibilities" rows="3" required placeholder="Ex.: Plan, lead, manage, control">' + escapeHtml(p.responsibilities || '') + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Key Deliverables <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-deliverables" rows="2" required placeholder="Ex.: System, facility, product">' + escapeHtml(p.deliverables || '') + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Challenges / Risks / Issues Managed <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-challenges" rows="2" required placeholder="Ex.: Risks, delays, issues">' + escapeHtml(p.challenges || '') + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Project Outcomes <span class="text-danger">*</span></label>' +
+            '   <textarea class="form-control project-outcomes" rows="2" required placeholder="Ex.: Cost savings, efficiency, satisfaction">' + escapeHtml(p.outcomes || '') + '</textarea>' +
+            '</div>' +
+
+            // 4. Governance & Additional Details
+            '<div class="cv-section-title"><i class="fa fa-users"></i> Stakeholders, Resources & Governance</div>' +
+            '<div class="row">' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Stakeholders Managed</label>' +
+            '       <input type="text" class="form-control project-stakeholders" value="' + escapeHtml(p.stakeholders || '') + '" placeholder="Ex.: Client, team, suppliers">' +
+            '   </div>' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Team & Resources Managed</label>' +
+            '       <input type="text" class="form-control project-teamresources" value="' + escapeHtml(p.teamresources || '') + '" placeholder="Ex.: Team, budget, equipment">' +
+            '   </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Changes Managed</label>' +
+            '       <input type="text" class="form-control project-changes" value="' + escapeHtml(p.changes || '') + '" placeholder="Ex.: Scope, schedule, requirements">' +
+            '   </div>' +
+            '   <div class="col-md-6 mb-3">' +
+            '       <label class="form-label">Measurable Results</label>' +
+            '       <input type="text" class="form-control project-measurableresults" value="' + escapeHtml(p.measurableresults || '') + '" placeholder="Ex.: 20% cost reduction, 15% faster delivery">' +
+            '   </div>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '   <label class="form-label">Project Closure / Handover</label>' +
+            '   <input type="text" class="form-control project-closure" value="' + escapeHtml(p.closure || '') + '" placeholder="Ex.: Acceptance, handover, closeout">' +
+            '</div>' +
             '<div class="mb-2">' +
-            '   <label class="form-label font-weight-bold">Tasks & Notes *</label>' +
-            '   <textarea class="form-control project-notes" rows="4" required placeholder="Describe project objectives, key deliverables, what you personally managed, tools used, and final results...">' + escapeHtml(p.notes || '') + '</textarea>' +
+            '   <label class="form-label">Additional Information</label>' +
+            '   <textarea class="form-control project-additionalinfo" rows="2" placeholder="Ex.: Other relevant details">' + escapeHtml(p.additionalinfo || '') + '</textarea>' +
             '</div>' +
             '</div>';
 
@@ -292,6 +397,26 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 }
             });
 
+            // Event delegation for ongoing checkbox to disable/enable End Date.
+            document.getElementById('projects_container').addEventListener('change', function(e) {
+                if (e.target && e.target.classList.contains('project-iscurrent')) {
+                    var card = e.target.closest('.cv-project-card');
+                    if (card) {
+                        var endInput = card.querySelector('.project-enddate');
+                        if (endInput) {
+                            if (e.target.checked) {
+                                endInput.disabled = true;
+                                endInput.removeAttribute('required');
+                                endInput.value = '';
+                            } else {
+                                endInput.disabled = false;
+                                endInput.setAttribute('required', 'required');
+                            }
+                        }
+                    }
+                }
+            });
+
             // Event delegation for Copy buttons.
             document.addEventListener('click', function(e) {
                 var copyBtn = e.target.closest('.cv-copy-btn');
@@ -351,27 +476,58 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     for (var i = 0; i < projectCards.length; i++) {
                         var card = projectCards[i];
                         var title = card.querySelector('.project-title').value.trim();
+                        var industry = card.querySelector('.project-industry').value.trim();
+                        var organization = card.querySelector('.project-organization').value.trim();
+                        var jobtitle = card.querySelector('.project-jobtitle').value.trim();
                         var role = card.querySelector('.project-role').value.trim();
                         var methodology = card.querySelector('.project-methodology').value;
                         var startdate = card.querySelector('.project-startdate').value.trim();
-                        var enddate = card.querySelector('.project-enddate').value.trim();
                         var iscurrent = card.querySelector('.project-iscurrent').checked;
-                        var notes = card.querySelector('.project-notes').value.trim();
+                        var enddate = iscurrent ? '' : card.querySelector('.project-enddate').value.trim();
+                        var objective = card.querySelector('.project-objective').value.trim();
+                        var scope = card.querySelector('.project-scope').value.trim();
+                        var responsibilities = card.querySelector('.project-responsibilities').value.trim();
+                        var deliverables = card.querySelector('.project-deliverables').value.trim();
+                        var stakeholders = card.querySelector('.project-stakeholders').value.trim();
+                        var teamresources = card.querySelector('.project-teamresources').value.trim();
+                        var challenges = card.querySelector('.project-challenges').value.trim();
+                        var changes = card.querySelector('.project-changes').value.trim();
+                        var outcomes = card.querySelector('.project-outcomes').value.trim();
+                        var measurableresults = card.querySelector('.project-measurableresults').value.trim();
+                        var closure = card.querySelector('.project-closure').value.trim();
+                        var additionalinfo = card.querySelector('.project-additionalinfo').value.trim();
 
-                        if (!title || !role || !startdate || !notes) {
-                            errorAlert.textContent = 'Please complete all required fields for Project #' + (i + 1);
+                        if (!title || !industry || !jobtitle || !role || !startdate || (!iscurrent && !enddate) ||
+                            !objective || !scope || !responsibilities || !deliverables || !challenges || !outcomes) {
+                            errorAlert.textContent = 'Please complete all required fields (*) for Project #' + (i + 1);
                             errorAlert.classList.remove('d-none');
+                            card.scrollIntoView({ behavior: 'smooth' });
                             return;
                         }
 
                         projects.push({
                             title: title,
+                            industry: industry,
+                            organization: organization,
+                            jobtitle: jobtitle,
                             role: role,
                             methodology: methodology,
                             startdate: startdate,
                             enddate: enddate,
                             iscurrent: iscurrent,
-                            notes: notes
+                            objective: objective,
+                            scope: scope,
+                            responsibilities: responsibilities,
+                            deliverables: deliverables,
+                            stakeholders: stakeholders,
+                            teamresources: teamresources,
+                            challenges: challenges,
+                            changes: changes,
+                            outcomes: outcomes,
+                            measurableresults: measurableresults,
+                            closure: closure,
+                            additionalinfo: additionalinfo,
+                            notes: objective + '\n' + responsibilities
                         });
                     }
 

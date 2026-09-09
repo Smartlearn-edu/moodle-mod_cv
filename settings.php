@@ -45,4 +45,14 @@ if ($ADMIN->fulltree) {
         get_string('default_auth_token_desc', 'mod_cv'),
         ''
     ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'mod_cv/default_prompt',
+        get_string('default_prompt', 'mod_cv'),
+        get_string('default_prompt_desc', 'mod_cv'),
+        '',
+        PARAM_RAW,
+        60,
+        8
+    ));
 }

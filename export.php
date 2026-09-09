@@ -120,18 +120,52 @@ if (!empty($aioutput['summary'])) {
 
 // Project Experience.
 $html .= '<h2>4. Project Experience Write-Ups (PMI Format)</h2>';
+$savedprojects = $rawinput['projects'] ?? [];
+
 if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {
     foreach ($aioutput['projects'] as $index => $proj) {
         $projnum = $index + 1;
+        $rawproj = $savedprojects[$index] ?? [];
+
         $html .= '<div class="project-card">';
-        $html .= '<h3>Project #' . $projnum . ': ' . htmlspecialchars($proj['title'] ?? 'Untitled Project') . '</h3>';
-        if (!empty($proj['role'])) {
-            $html .= '<p><strong>Role on Project:</strong> ' . htmlspecialchars($proj['role']) . '</p>';
+        $html .= '<h3>Project #' . $projnum . ': ' . htmlspecialchars($proj['title'] ?? ($rawproj['title'] ?? 'Untitled Project')) . '</h3>';
+
+        $metaitems = [];
+        $role = !empty($proj['role']) ? $proj['role'] : ($rawproj['role'] ?? '');
+        if (!empty($role)) {
+            $metaitems[] = '<strong>Role:</strong> ' . htmlspecialchars($role);
+        }
+        if (!empty($rawproj['jobtitle'])) {
+            $metaitems[] = '<strong>Job Title:</strong> ' . htmlspecialchars($rawproj['jobtitle']);
+        }
+        if (!empty($rawproj['industry'])) {
+            $metaitems[] = '<strong>Industry:</strong> ' . htmlspecialchars($rawproj['industry']);
+        }
+        if (!empty($rawproj['organization'])) {
+            $metaitems[] = '<strong>Organization:</strong> ' . htmlspecialchars($rawproj['organization']);
+        }
+        if (!empty($rawproj['startdate'])) {
+            $startformatted = $rawproj['startdate'];
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $startformatted, $m)) {
+                $startformatted = $m[3] . '/' . $m[2] . '/' . $m[1];
+            }
+            $endformatted = !empty($rawproj['iscurrent']) ? 'Ongoing (Present)' : ($rawproj['enddate'] ?? '');
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $endformatted, $m)) {
+                $endformatted = $m[3] . '/' . $m[2] . '/' . $m[1];
+            }
+            $metaitems[] = '<strong>Dates:</strong> ' . htmlspecialchars($startformatted . ' to ' . $endformatted);
+        }
+        if (!empty($rawproj['methodology'])) {
+            $metaitems[] = '<strong>Methodology:</strong> ' . htmlspecialchars(ucfirst($rawproj['methodology']));
         }
 
-        $formattedDesc = $proj['formatted_description'] ?? $proj['description'] ?? '';
-        if (is_string($formattedDesc)) {
-            $html .= '<p>' . nl2br(htmlspecialchars($formattedDesc)) . '</p>';
+        if (!empty($metaitems)) {
+            $html .= '<p style="color: #475569; font-size: 8.5pt; margin-bottom: 6px;">' . implode(' &bull; ', $metaitems) . '</p>';
+        }
+
+        $formatteddesc = $proj['formatted_description'] ?? $proj['description'] ?? '';
+        if (is_string($formatteddesc)) {
+            $html .= '<p>' . nl2br(htmlspecialchars($formatteddesc)) . '</p>';
         }
         $html .= '</div>';
     }

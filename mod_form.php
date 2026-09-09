@@ -80,6 +80,10 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setType('webhookurl', PARAM_URL);
         $mform->addHelpButton('webhookurl', 'webhook_url_override', 'mod_cv');
 
+        $mform->addElement('textarea', 'customprompt', get_string('custom_prompt', 'mod_cv'), ['rows' => 6, 'cols' => 60]);
+        $mform->setType('customprompt', PARAM_RAW);
+        $mform->addHelpButton('customprompt', 'custom_prompt', 'mod_cv');
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 

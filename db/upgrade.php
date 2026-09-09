@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and specification for mod_cv.
+ * Upgrade steps for mod_cv.
  *
  * @package    mod_cv
  * @copyright  2025 Mohammad Nabil <mohammad@smartlearn.education>
@@ -24,8 +24,30 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_cv';
-$plugin->version = 2026090900;
-$plugin->requires = 2022112800; // Requires Moodle 4.1 or higher.
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v0.2.0';
+/**
+ * Execute mod_cv upgrade from an earlier version.
+ *
+ * @param int $oldversion
+ * @return bool
+ */
+function xmldb_cv_upgrade(int $oldversion): bool {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2026090900) {
+        // Define field customprompt to be added to cv table.
+        $table = new xmldb_table('cv');
+        $field = new xmldb_field('customprompt', XMLDB_TYPE_TEXT, null, null, null, null, null, 'webhookurl');
+
+        // Conditionally launch add field customprompt.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026090900, 'cv');
+    }
+
+    return true;
+}

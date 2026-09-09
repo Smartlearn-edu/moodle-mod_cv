@@ -92,7 +92,28 @@
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.path-mod-cv .cv-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 18px 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.path-mod-cv .cv-project-card label.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #334155;
 }
 
 .path-mod-cv .cv-output-box {
