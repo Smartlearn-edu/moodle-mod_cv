@@ -26,6 +26,21 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
+        'mod_cv/ai_settings',
+        get_string('aiprovider', 'mod_cv'),
+        get_string('aiprovider_desc', 'mod_cv')
+    ));
+
+    $provideroptions = \mod_cv\ai_processor::get_provider_options(false);
+    $settings->add(new admin_setting_configselect(
+        'mod_cv/default_aiprovider',
+        get_string('aiprovider', 'mod_cv'),
+        get_string('aiprovider_desc', 'mod_cv'),
+        \mod_cv\ai_processor::PROVIDER_AUTO,
+        $provideroptions
+    ));
+
+    $settings->add(new admin_setting_heading(
         'mod_cv/n8n_settings',
         get_string('settings_n8n_heading', 'mod_cv'),
         get_string('settings_n8n_heading_desc', 'mod_cv')

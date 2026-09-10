@@ -68,5 +68,18 @@ function xmldb_cv_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026091000, 'cv');
     }
 
+    if ($oldversion < 2026091002) {
+        $table = new xmldb_table('cv');
+
+        // Define field aiprovider to be added to cv table.
+        $aiprovider = new xmldb_field('aiprovider', XMLDB_TYPE_CHAR, '30', null, null, null, 'default', 'customcert');
+        if (!$dbman->field_exists($table, $aiprovider)) {
+            $dbman->add_field($table, $aiprovider);
+        }
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026091002, 'cv');
+    }
+
     return true;
 }

@@ -204,9 +204,9 @@ $string['field_additional_info'] = 'معلومات إضافية (Additional Info
 $string['placeholder_additional_info'] = 'Ex.: Other relevant details';
 
 $string['step_action_title'] = '4. التوليد والمراجعة';
-$string['btn_generate_ai'] = 'المعالجة بالذكاء الاصطناعي عبر n8n';
-$string['generating_message'] = 'جارٍ إرسال البيانات إلى n8n وتوليد طلب PMI المتوافق... يرجى الانتظار.';
-$string['generation_error'] = 'فشل في توليد الطلب. يرجى التحقق من اتصال n8n webhook.';
+$string['btn_generate_ai'] = 'توليد بالذكاء الاصطناعي';
+$string['generating_message'] = 'جارٍ معالجة مؤهلاتك وتوليد ملف الطلب بالذكاء الاصطناعي... يرجى الانتظار.';
+$string['generation_error'] = 'فشل في توليد الطلب. يرجى التحقق من إعدادات مزود الذكاء الاصطناعي.';
 $string['btn_download_pdf'] = 'تحميل ملف PDF للطلب';
 $string['btn_copy_field'] = 'نسخ';
 $string['copied_to_clipboard'] = 'تم النسخ إلى الحافظة!';
@@ -214,10 +214,23 @@ $string['preview_heading'] = 'مراجعة الطلب المصاغ بالذكا�
 $string['summary_heading'] = 'الملخص المهني';
 $string['no_projects_added'] = 'يرجى إضافة مشروع واحد على الأقل قبل المتابعة.';
 $string['status_saved'] = 'تم حفظ المسودة بنجاح.';
-$string['status_pending'] = 'تم إرسال طلبك للمعالجة بالخلفية عبر n8n.';
-$string['error_no_webhook'] = 'لم يتم تهيئة رابط n8n webhook. يرجى ضبطه في إعدادات النشاط أو إدارة الموقع.';
-$string['error_n8n_request'] = 'خطأ في الاتصال مع n8n: {$a}';
+$string['status_pending'] = 'تم إرسال طلبك وجارٍ معالجته في الخلفية.';
+$string['error_no_webhook'] = 'لم يتم تهيئة رابط webhook الخارجي. يرجى ضبطه في إعدادات النشاط أو إدارة الموقع.';
+$string['error_n8n_request'] = 'خطأ في الاتصال مع Webhook: {$a}';
 $string['error_no_output_to_export'] = 'لا توجد بيانات جاهزة للتصدير حالياً. يرجى المعالجة أولاً.';
+
+// AI Provider settings strings.
+$string['aiprovider'] = 'محرك / مزود الذكاء الاصطناعي';
+$string['aiprovider_help'] = 'اختر محرك الذكاء الاصطناعي لتوليد ملف الطلب: الكشف التلقائي، أو إضافة AI Hub (BYOK)، أو نظام المودل المدمج (Core AI)، أو Webhook خارجي (n8n, Make وغيرهما).';
+$string['aiprovider_desc'] = 'حدد محرك الذكاء الاصطناعي الافتراضي لجميع أنشطة مساعد السيرة الذاتية على مستوى الموقع.';
+$string['aiprovider_default'] = 'الافتراضي للموقع ({$a})';
+$string['aiprovider_auto'] = 'كشف تلقائي (الأفضل متاحاً: AI Hub ← Core AI ← Webhook)';
+$string['aiprovider_aihub'] = 'إضافة AI Hub الموحدة (local_aihub - BYOK)';
+$string['aiprovider_core_ai'] = 'نظام الذكاء الاصطناعي المدمج بمودل (core_ai)';
+$string['aiprovider_webhook'] = 'Webhook خارجي (n8n / Make / API مخصص)';
+$string['error_no_aiprovider'] = 'لا يتوفر أي مزود ذكاء اصطناعي صالح. يرجى التأكد من تثبيت إضافة AI Hub مع مفاتيح صالحة، أو تفعيل Core AI بمودل، أو تهيئة رابط Webhook الخارجي.';
+$string['error_aihub_failed'] = 'فشلت معالجة AI Hub: {$a}';
+$string['error_core_ai_failed'] = 'فشلت معالجة نظام المودل Core AI: {$a}';
 
 // Privacy strings.
 $string['privacy:metadata:cv_submissions'] = 'يخزن خبرات المشاريع وبيانات السيرة الذاتية المعالجة بالذكاء الاصطناعي.';

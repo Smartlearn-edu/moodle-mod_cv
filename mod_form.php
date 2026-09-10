@@ -84,9 +84,19 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setDefault('providername', 'SmartLearn Education');
         $mform->addHelpButton('providername', 'provider_name', 'mod_cv');
 
+        // AI Provider selector.
+        $provideroptions = \mod_cv\ai_processor::get_provider_options(true);
+        $mform->addElement('select', 'aiprovider', get_string('aiprovider', 'mod_cv'), $provideroptions);
+        $mform->setDefault('aiprovider', \mod_cv\ai_processor::PROVIDER_DEFAULT);
+        $mform->addHelpButton('aiprovider', 'aiprovider', 'mod_cv');
+
         $mform->addElement('text', 'webhookurl', get_string('webhook_url_override', 'mod_cv'), ['size' => '64']);
         $mform->setType('webhookurl', PARAM_URL);
         $mform->addHelpButton('webhookurl', 'webhook_url_override', 'mod_cv');
+        $mform->hideIf('webhookurl', 'aiprovider', 'in', [
+            \mod_cv\ai_processor::PROVIDER_AIHUB,
+            \mod_cv\ai_processor::PROVIDER_CORE_AI,
+        ]);
 
         $mform->addElement('textarea', 'customprompt', get_string('custom_prompt', 'mod_cv'), ['rows' => 6, 'cols' => 60]);
         $mform->setType('customprompt', PARAM_RAW);
@@ -111,5 +121,6 @@ class mod_cv_mod_form extends moodleform_mod {
         $examtype = $defaultvalues['examtype'] ?? 'pmp';
         $defaultvalues['fieldtype'] = $fieldtype;
         $defaultvalues['examtype_' . $fieldtype] = $examtype;
+        $defaultvalues['aiprovider'] = $defaultvalues['aiprovider'] ?? \mod_cv\ai_processor::PROVIDER_DEFAULT;
     }
 }

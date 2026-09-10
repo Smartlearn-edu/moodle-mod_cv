@@ -43,6 +43,10 @@ function cv_process_instance_data(stdClass $cv): void {
     if (!isset($cv->customcert)) {
         $cv->customcert = '';
     }
+
+    if (!isset($cv->aiprovider)) {
+        $cv->aiprovider = \mod_cv\ai_processor::PROVIDER_DEFAULT;
+    }
 }
 
 /**

@@ -201,9 +201,9 @@ $string['field_additional_info'] = 'Additional Information';
 $string['placeholder_additional_info'] = 'Ex.: Other relevant details';
 
 $string['step_action_title'] = '4. Generate & Review';
-$string['btn_generate_ai'] = 'Process with AI via n8n';
-$string['generating_message'] = 'Sending your data to n8n and generating your PMI-compliant application... Please wait.';
-$string['generation_error'] = 'Failed to generate AI application. Please verify the n8n webhook connection.';
+$string['btn_generate_ai'] = 'Generate with AI';
+$string['generating_message'] = 'Processing your qualifications and generating your application dossier with AI... Please wait.';
+$string['generation_error'] = 'Failed to generate AI application. Please verify your AI provider configuration.';
 $string['btn_download_pdf'] = 'Download Application PDF';
 $string['btn_copy_field'] = 'Copy';
 $string['copied_to_clipboard'] = 'Copied to clipboard!';
@@ -211,10 +211,23 @@ $string['preview_heading'] = 'AI-Formatted Application Review';
 $string['summary_heading'] = 'Executive Summary';
 $string['no_projects_added'] = 'Please add at least one project before processing.';
 $string['status_saved'] = 'Draft saved successfully.';
-$string['status_pending'] = 'Your application has been dispatched to n8n and is being processed in the background.';
-$string['error_no_webhook'] = 'No n8n webhook URL is configured. Please configure it in the activity settings or site administration.';
-$string['error_n8n_request'] = 'n8n communication error: {$a}';
+$string['status_pending'] = 'Your application has been dispatched and is being processed in the background.';
+$string['error_no_webhook'] = 'No external webhook URL is configured. Please configure it in the activity settings or site administration.';
+$string['error_n8n_request'] = 'Webhook communication error: {$a}';
 $string['error_no_output_to_export'] = 'No processed application data available to export. Please generate with AI first.';
+
+// AI Provider settings strings.
+$string['aiprovider'] = 'AI Engine / Provider';
+$string['aiprovider_help'] = 'Choose which AI engine will generate the application dossier: Auto-detect, AI Hub plugin (BYOK), Moodle Core AI subsystem, or an External Webhook (n8n, Make, etc.).';
+$string['aiprovider_desc'] = 'Select the default AI engine used site-wide across all Application & CV Builder activities.';
+$string['aiprovider_default'] = 'Site Default ({$a})';
+$string['aiprovider_auto'] = 'Auto-Detect (Best available: AI Hub → Core AI → Webhook)';
+$string['aiprovider_aihub'] = 'AI Hub Plugin (local_aihub - BYOK)';
+$string['aiprovider_core_ai'] = 'Moodle Core AI Subsystem (core_ai)';
+$string['aiprovider_webhook'] = 'External Webhook (n8n / Make / Custom API)';
+$string['error_no_aiprovider'] = 'No functional AI provider is available. Please ensure AI Hub (local_aihub) is installed with valid keys, Moodle Core AI is configured, or an external webhook URL is set.';
+$string['error_aihub_failed'] = 'AI Hub generation failed: {$a}';
+$string['error_core_ai_failed'] = 'Moodle Core AI generation failed: {$a}';
 
 // Privacy strings.
 $string['privacy:metadata:cv_submissions'] = 'Stores candidate project experience and AI-processed CV/application data.';

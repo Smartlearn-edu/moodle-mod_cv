@@ -117,12 +117,8 @@ class submit extends external_api {
         $cv = $DB->get_record('cv', ['id' => $cm->instance], '*', MUST_EXIST);
         $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 
-        // Determine webhook URL.
+        // Determine webhook URL if configured.
         $webhookurl = !empty($cv->webhookurl) ? $cv->webhookurl : get_config('mod_cv', 'default_webhook_url');
-        if (empty($webhookurl)) {
-            throw new moodle_exception('error_no_webhook', 'mod_cv', '', null, 'No n8n webhook URL configured.');
-        }
-
         $authtoken = get_config('mod_cv', 'default_auth_token');
 
         $now = time();
@@ -207,16 +203,22 @@ class submit extends external_api {
             'projects' => $params['projects'],
         ];
 
-        // Send to n8n webhook.
-        $airesponse = \mod_cv\n8n_client::send($webhookurl, $payload, $authtoken);
+        // Process through multi-backend AI processor (local_aihub, core_ai, or webhook).
+        $result = \mod_cv\ai_processor::process(
+            $cv,
+            $context,
+            $params,
+            $coursedata,
+            $prompt,
+            $webhookurl,
+            $authtoken,
+            $payload
+        );
 
-        // Check if n8n returned immediate synchronous output or asynchronous acknowledgment.
-        $iscompleted = false;
-        $outputjson = '';
+        $iscompleted = !empty($result['completed']) && !empty($result['outputjson']);
+        $outputjson = $iscompleted ? $result['outputjson'] : '';
 
-        if (!empty($airesponse['summary']) || !empty($airesponse['projects'])) {
-            $iscompleted = true;
-            $outputjson = json_encode($airesponse, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($iscompleted) {
             $submission->ai_output = $outputjson;
             $submission->status = 'completed';
             $submission->timemodified = time();
