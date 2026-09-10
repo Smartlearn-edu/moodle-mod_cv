@@ -50,21 +50,29 @@ class mod_cv_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements();
 
-        // Certification & Exam settings.
+        // Certification & Track Configuration.
         $mform->addElement('header', 'examsettings', get_string('activity_settings', 'mod_cv'));
 
-        $examoptions = [
-            'pmp' => get_string('exam_pmp', 'mod_cv'),
-            'capm' => get_string('exam_capm', 'mod_cv'),
-            'pmi_acp' => get_string('exam_pmi_acp', 'mod_cv'),
-            'pmi_rmp' => get_string('exam_pmi_rmp', 'mod_cv'),
-            'pmi_pba' => get_string('exam_pmi_pba', 'mod_cv'),
-            'pgmp' => get_string('exam_pgmp', 'mod_cv'),
-            'custom' => get_string('exam_custom', 'mod_cv'),
-        ];
-        $mform->addElement('select', 'examtype', get_string('exam_type', 'mod_cv'), $examoptions);
-        $mform->setDefault('examtype', 'pmp');
-        $mform->addHelpButton('examtype', 'exam_type', 'mod_cv');
+        // Domain / Professional Track selector.
+        $domainoptions = \mod_cv\domains::get_domains();
+        $mform->addElement('select', 'fieldtype', get_string('field_type', 'mod_cv'), $domainoptions);
+        $mform->setDefault('fieldtype', \mod_cv\domains::DOMAIN_PMI);
+        $mform->addHelpButton('fieldtype', 'field_type', 'mod_cv');
+
+        // Dynamic certification dropdowns per domain track.
+        foreach (array_keys($domainoptions) as $domainkey) {
+            $certoptions = \mod_cv\domains::get_certifications($domainkey);
+            $elementname = 'examtype_' . $domainkey;
+            $mform->addElement('select', $elementname, get_string('exam_type', 'mod_cv'), $certoptions);
+            $defaultcert = key($certoptions);
+            $mform->setDefault($elementname, $defaultcert);
+            $mform->hideIf($elementname, 'fieldtype', 'neq', $domainkey);
+        }
+
+        // Custom certification / track title (optional override).
+        $mform->addElement('text', 'customcert', get_string('custom_cert_name', 'mod_cv'), ['size' => '48']);
+        $mform->setType('customcert', PARAM_TEXT);
+        $mform->addHelpButton('customcert', 'custom_cert_name', 'mod_cv');
 
         $mform->addElement('text', 'contacthours', get_string('contact_hours', 'mod_cv'), ['size' => '10']);
         $mform->setType('contacthours', PARAM_INT);
@@ -89,5 +97,19 @@ class mod_cv_mod_form extends moodleform_mod {
 
         // Standard buttons.
         $this->add_action_buttons();
+    }
+
+    /**
+     * Prepare form data before display.
+     *
+     * @param array $defaultvalues
+     */
+    public function data_preprocessing(&$defaultvalues) {
+        parent::data_preprocessing($defaultvalues);
+
+        $fieldtype = $defaultvalues['fieldtype'] ?? \mod_cv\domains::DOMAIN_PMI;
+        $examtype = $defaultvalues['examtype'] ?? 'pmp';
+        $defaultvalues['fieldtype'] = $fieldtype;
+        $defaultvalues['examtype_' . $fieldtype] = $examtype;
     }
 }

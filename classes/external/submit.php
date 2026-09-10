@@ -160,8 +160,21 @@ class submit extends external_api {
 
         $callbackurl = (new \moodle_url('/mod/cv/callback.php'))->out(false);
 
+        $fieldtype = !empty($cv->fieldtype) ? $cv->fieldtype : \mod_cv\domains::DOMAIN_PMI;
+        $customcert = !empty($cv->customcert) ? $cv->customcert : '';
+        $domainprompt = \mod_cv\domains::get_default_prompt($fieldtype, $cv->examtype);
         $defaultprompt = get_config('mod_cv', 'default_prompt');
-        $prompt = !empty($cv->customprompt) ? $cv->customprompt : ($defaultprompt ?: '');
+
+        if (!empty($cv->customprompt)) {
+            $prompt = $cv->customprompt;
+        } else if (!empty($defaultprompt)) {
+            $prompt = $defaultprompt;
+        } else {
+            $prompt = $domainprompt;
+        }
+
+        $domaintitle = \mod_cv\domains::get_domain_title($fieldtype);
+        $certtitle = \mod_cv\domains::get_cert_title($fieldtype, $cv->examtype, $customcert);
 
         // Construct payload for n8n.
         $payload = [
@@ -172,8 +185,14 @@ class submit extends external_api {
             'userid' => (int) $USER->id,
             'prompt' => $prompt,
             'custom_prompt' => $prompt,
+            'domain' => [
+                'type' => $fieldtype,
+                'title' => $domaintitle,
+            ],
             'exam' => [
                 'type' => $cv->examtype,
+                'title' => $certtitle,
+                'custom_cert' => $customcert,
                 'contact_hours' => (int) $cv->contacthours,
                 'provider' => $cv->providername ?? 'SmartLearn Education',
             ],

@@ -27,8 +27,11 @@
             <h2 class="mb-1">{{activityname}}</h2>
             <p class="text-muted mb-0">{{#str}}header_subtitle, mod_cv{{/str}}</p>
         </div>
-        <div>
-            <span class="cv-badge-exam">{{exam_title}}</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            {{#domain_title}}
+                <span class="badge badge-secondary bg-secondary px-3 py-2 text-white font-weight-bold"><i class="fa fa-th-large"></i> {{domain_title}}</span>
+            {{/domain_title}}
+            <span class="cv-badge-exam"><i class="fa fa-certificate"></i> {{exam_title}}</span>
         </div>
     </div>
 
@@ -121,6 +124,12 @@
                     </div>
                 </div>
                 <div class="cv-info-grid mt-2">
+                    {{#domain_title}}
+                    <div class="cv-info-item">
+                        <label>{{#str}}field_type, mod_cv{{/str}}</label>
+                        <span>{{domain_title}}</span>
+                    </div>
+                    {{/domain_title}}
                     <div class="cv-info-item">
                         <label>{{#str}}exam_type, mod_cv{{/str}}</label>
                         <span>{{exam_title}}</span>

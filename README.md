@@ -1,22 +1,34 @@
-# PMI Application & CV Builder (`mod_cv`)
+# Application & CV Builder (`mod_cv`)
 
-A course-aware Moodle activity module designed to help students assemble, format, and generate their official **PMI (Project Management Institute)** certification applications (PMP®, PMI-ACP®, CAPM®, PMI-RMP®, etc.) and CVs.
+A course-aware Moodle activity module designed to help students assemble, format, and generate official professional credentialing applications, portfolio write-ups, and CV dossiers across multiple disciplines (Project Management / PMI, Healthcare & Medical, Computer & IT, Languages & Translation, Business & Finance, and General).
 
 ---
 
 ## Key Features
 
-1. **Course & Certification Aware**:
+1. **Multi-Domain Track & Certification Aware**:
    - Configured directly inside the Moodle course.
-   - Automatically injects course metadata (Course name, target PMI exam, qualifying contact hours, training provider name).
-2. **AI-Powered via n8n Webhook**:
-   - Collects candidate profile and project experience (Title, Role, Methodology, Dates, Raw notes).
+   - Choose from 6 major professional disciplines:
+     - **Project Management (PMI®)**: PMP®, CAPM®, PMI-ACP®, PMI-RMP®, PMI-PBA®, PgMP®.
+     - **Healthcare & Medical**: Medical Board Licensing, Clinical Nursing (RN), BLS/ACLS, Clinical Fellowship, Pharmacy Specialties (BPS), Healthcare Admin (CPHQ).
+     - **Information Technology & Computing**: Cloud Architecture (AWS/Azure/GCP), Cisco Networking (CCNA/CCNP), Cybersecurity (Security+/CEH), Kubernetes (CKA), Data Science & AI, Full-Stack Software Engineering.
+     - **Languages & Translation**: IELTS/TOEFL, Certified Translator, CEFR C1/C2, TEFL/TESOL.
+     - **Business & Finance**: CFA®, CPA, SHRM HR, Lean Six Sigma, CMA.
+     - **General Professional**: Comprehensive CV, Portfolio & Custom Track.
+   - Automatically injects course metadata (Course name, target track, qualifying contact hours, training provider name).
+
+2. **Built-in Domain AI Prompts with Custom Override**:
+   - High-performance, domain-specific AI system prompts pre-configured for each track.
+   - Teachers can optionally override or customize prompts per course activity.
+
+3. **AI-Powered via n8n Webhook**:
+   - Collects candidate profile, education dates, and full 20 structured experience fields.
    - Sends structured JSON to your n8n workflow.
-   - n8n handles the AI processing (prompting LLMs like Claude, OpenAI, or Gemini) to format descriptions into PMBOK-compliant structure (Objective, Outcome, Role, Responsibilities by process groups or agile domains).
-3. **Copy-to-PMI.org Convenience**:
-   - One-click "Copy" buttons next to each formatted project description for seamless pasting into the official PMI application portal.
-4. **Audit-Ready PDF Dossier**:
-   - Instant download of a clean, structured PDF application dossier using Moodle's built-in PDF generator (`export.php`).
+   - n8n handles AI processing (prompting LLMs like Claude, OpenAI, or Gemini) to format descriptions into credential-compliant structures.
+
+4. **Convenient Copy & PDF Dossier**:
+   - One-click "Copy" buttons next to each formatted project description.
+   - Instant download of a clean, structured PDF dossier using Moodle's built-in PDF generator (`export.php`).
 
 ---
 
@@ -29,7 +41,7 @@ A course-aware Moodle activity module designed to help students assemble, format
    ```
 2. Visit **Site Administration > Notifications** to complete the database installation.
 3. Configure the default webhook at:
-   **Site Administration > Plugins > Activity modules > PMI Application & CV Builder**
+   **Site Administration > Plugins > Activity modules > Application & CV Builder**
    - **Default n8n Webhook URL**: `https://your-n8n-instance.com/webhook/mod-cv-process`
    - **Bearer Auth Token**: Optional authentication token.
 

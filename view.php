@@ -139,17 +139,11 @@ if (!$foundcurrent) {
     ]);
 }
 
-// Resolve exam title.
-$examtitles = [
-    'pmp' => get_string('exam_pmp', 'mod_cv'),
-    'capm' => get_string('exam_capm', 'mod_cv'),
-    'pmi_acp' => get_string('exam_pmi_acp', 'mod_cv'),
-    'pmi_rmp' => get_string('exam_pmi_rmp', 'mod_cv'),
-    'pmi_pba' => get_string('exam_pmi_pba', 'mod_cv'),
-    'pgmp' => get_string('exam_pgmp', 'mod_cv'),
-    'custom' => get_string('exam_custom', 'mod_cv'),
-];
-$examtitle = $examtitles[$cv->examtype] ?? strtoupper($cv->examtype);
+// Resolve domain and certification titles.
+$fieldtype = !empty($cv->fieldtype) ? $cv->fieldtype : \mod_cv\domains::DOMAIN_PMI;
+$customcert = !empty($cv->customcert) ? $cv->customcert : '';
+$domaintitle = \mod_cv\domains::get_domain_title($fieldtype);
+$examtitle = \mod_cv\domains::get_cert_title($fieldtype, $cv->examtype, $customcert);
 
 $status = $submission ? $submission->status : 'draft';
 $ispending = ($status === 'pending');
@@ -162,6 +156,8 @@ $templatedata = [
     'courses_list' => $courseslist,
     'course_startdate' => $coursestartdate,
     'course_enddate' => $courseenddate,
+    'domain_type' => $fieldtype,
+    'domain_title' => $domaintitle,
     'exam_title' => $examtitle,
     'contact_hours' => $cv->contacthours,
     'provider_name' => !empty($cv->providername) ? $cv->providername : 'SmartLearn Education',

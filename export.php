@@ -54,16 +54,10 @@ $profile = $rawinput['profile'] ?? [
     'degree_enddate' => '',
 ];
 
-$examtitles = [
-    'pmp' => 'PMP® (Project Management Professional)',
-    'capm' => 'CAPM® (Certified Associate in Project Management)',
-    'pmi_acp' => 'PMI-ACP® (Agile Certified Practitioner)',
-    'pmi_rmp' => 'PMI-RMP® (Risk Management Professional)',
-    'pmi_pba' => 'PMI-PBA® (Professional in Business Analysis)',
-    'pgmp' => 'PgMP® (Program Management Professional)',
-    'custom' => 'General Professional Application',
-];
-$examtitle = $examtitles[$cv->examtype] ?? strtoupper($cv->examtype);
+$fieldtype = !empty($cv->fieldtype) ? $cv->fieldtype : \mod_cv\domains::DOMAIN_PMI;
+$customcert = !empty($cv->customcert) ? $cv->customcert : '';
+$domaintitle = \mod_cv\domains::get_domain_title($fieldtype);
+$examtitle = \mod_cv\domains::get_cert_title($fieldtype, $cv->examtype, $customcert);
 $providername = !empty($cv->providername) ? $cv->providername : 'SmartLearn Education';
 
 // Initialize Moodle PDF generator (TCPDF).
@@ -90,7 +84,7 @@ $html = '<style>
 </style>';
 
 $html .= '<h1>Application & Project Experience Dossier</h1>';
-$html .= '<p style="color: #64748b; font-size: 9pt;">Official Candidate Project Experience Record for ' . htmlspecialchars($examtitle) . '</p>';
+$html .= '<p style="color: #64748b; font-size: 9pt;">Official Professional Dossier for ' . htmlspecialchars($examtitle) . ' &bull; ' . htmlspecialchars($domaintitle) . '</p>';
 
 // Candidate Section.
 $html .= '<h2>1. Candidate Profile</h2>';
@@ -143,6 +137,7 @@ if (!empty($savedcourse['startdate']) || !empty($savedcourse['enddate'])) {
         $html .= '<tr><td class="label">Course Dates:</td><td>' . htmlspecialchars($cdates) . '</td></tr>';
     }
 }
+$html .= '<tr><td class="label">Professional Track:</td><td>' . htmlspecialchars($domaintitle) . '</td></tr>';
 $html .= '<tr><td class="label">Target Certification:</td><td>' . htmlspecialchars($examtitle) . '</td></tr>';
 $html .= '<tr><td class="label">Qualifying Contact Hours:</td><td>' . htmlspecialchars($cv->contacthours) . ' Hours</td></tr>';
 $html .= '<tr><td class="label">Education Provider:</td><td>' . htmlspecialchars($providername) . '</td></tr>';

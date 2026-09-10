@@ -25,6 +25,27 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Helper to process and normalize instance data before saving.
+ *
+ * @param stdClass $cv
+ */
+function cv_process_instance_data(stdClass $cv): void {
+    $fieldtype = !empty($cv->fieldtype) ? $cv->fieldtype : \mod_cv\domains::DOMAIN_PMI;
+    $cv->fieldtype = $fieldtype;
+
+    $certfield = 'examtype_' . $fieldtype;
+    if (isset($cv->$certfield)) {
+        $cv->examtype = $cv->$certfield;
+    } else if (empty($cv->examtype)) {
+        $cv->examtype = 'custom';
+    }
+
+    if (!isset($cv->customcert)) {
+        $cv->customcert = '';
+    }
+}
+
+/**
  * Add a new instance of mod_cv.
  *
  * @param stdClass $cv
@@ -33,6 +54,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 function cv_add_instance(stdClass $cv, $mform = null) {
     global $DB;
+
+    cv_process_instance_data($cv);
 
     $cv->timecreated = time();
     $cv->timemodified = $cv->timecreated;
@@ -49,6 +72,8 @@ function cv_add_instance(stdClass $cv, $mform = null) {
  */
 function cv_update_instance(stdClass $cv, $mform = null) {
     global $DB;
+
+    cv_process_instance_data($cv);
 
     $cv->timemodified = time();
     $cv->id = $cv->instance;

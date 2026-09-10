@@ -49,5 +49,24 @@ function xmldb_cv_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026090900, 'cv');
     }
 
+    if ($oldversion < 2026091000) {
+        $table = new xmldb_table('cv');
+
+        // Define field fieldtype to be added to cv table.
+        $fieldtype = new xmldb_field('fieldtype', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'pmi', 'examtype');
+        if (!$dbman->field_exists($table, $fieldtype)) {
+            $dbman->add_field($table, $fieldtype);
+        }
+
+        // Define field customcert to be added to cv table.
+        $customcert = new xmldb_field('customcert', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'fieldtype');
+        if (!$dbman->field_exists($table, $customcert)) {
+            $dbman->add_field($table, $customcert);
+        }
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026091000, 'cv');
+    }
+
     return true;
 }

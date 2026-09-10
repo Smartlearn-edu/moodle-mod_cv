@@ -24,13 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'مساعد طلبات PMI وبناء السيرة الذاتية';
-$string['modulename'] = 'مساعد طلبات PMI وبناء السيرة الذاتية';
-$string['modulenameplural'] = 'أنشطة مساعد طلبات PMI وبناء السيرة الذاتية';
-$string['modulename_help'] = 'يساعد هذا النشاط الطلاب في تجميع خبرات مشاريعهم لشهادات معهد إدارة المشاريع PMI وصياغتها عبر الذكاء الاصطناعي بواسطة n8n وتحميلها بصيغة PDF.';
-$string['pluginadministration'] = 'إدارة مساعد طلبات PMI وبناء السيرة الذاتية';
-$string['cv:addinstance'] = 'إضافة نشاط جديد لمساعد طلبات PMI';
-$string['cv:view'] = 'معاينة نشاط مساعد طلبات PMI';
+$string['pluginname'] = 'مساعد طلبات الاعتماد وبناء السيرة الذاتية';
+$string['modulename'] = 'مساعد طلبات الاعتماد وبناء السيرة الذاتية';
+$string['modulenameplural'] = 'أنشطة مساعد طلبات الاعتماد وبناء السيرة الذاتية';
+$string['modulename_help'] = 'يساعد هذا النشاط الطلاب في تجميع مؤهلاتهم وخبرات مشاريعهم وصياغتها بالذكاء الاصطناعي عبر n8n ومراجعتها وتصديرها كملف PDF رسمي.';
+$string['pluginadministration'] = 'إدارة مساعد طلبات الاعتماد وبناء السيرة الذاتية';
+$string['cv:addinstance'] = 'إضافة نشاط جديد لمساعد طلبات الاعتماد';
+$string['cv:view'] = 'معاينة نشاط مساعد طلبات الاعتماد';
 $string['cv:submit'] = 'إرسال البيانات للمعالجة بالذكاء الاصطناعي';
 
 // Admin settings.
@@ -44,29 +44,83 @@ $string['default_prompt'] = 'البرومبت الافتراضي للنظام';
 $string['default_prompt_desc'] = 'التعليمات الافتراضية للذكاء الاصطناعي التي تُرسل إلى n8n في حال عدم تحديد برومبت مخصص داخل النشاط.';
 
 // Activity settings form.
-$string['activity_settings'] = 'إعدادات الشهادة والامتحان';
-$string['exam_type'] = 'شهادة PMI المستهدفة';
-$string['exam_type_help'] = 'اختر الشهادة التي يؤهل هذا المقرر الطالب للحصول عليها.';
-$string['exam_type_desc'] = 'اختر الشهادة التي يؤهل هذا المقرر الطالب للحصول عليها.';
+$string['activity_settings'] = 'إعدادات المسار المهني والشهادة';
+$string['field_type'] = 'المجال / المسار المهني';
+$string['field_type_help'] = 'اختر المجال أو القطاع المهني الذي يتبعه هذا النشاط. يوفر كل مجال خيارات شهادات مخصصة وبرومبت ذكاء اصطناعي متخصص مدمج تلقائياً.';
+$string['field_pmi'] = 'إدارة المشاريع (PMI®)';
+$string['field_medical'] = 'القطاع الصحي والطبي';
+$string['field_computer'] = 'تقنية المعلومات وهندسة الحاسوب';
+$string['field_languages'] = 'اللغات والترجمة';
+$string['field_business'] = 'إدارة الأعمال والمالية';
+$string['field_general'] = 'عام / مسار مهني مخصص';
+
+$string['exam_type'] = 'الشهادة المستهدفة / المسار';
+$string['exam_type_help'] = 'اختر الشهادة المهنية أو التخصص المستهدف الذي يؤهل هذا المقرر الطالب له.';
+$string['exam_type_desc'] = 'اختر الشهادة المهنية أو التخصص المستهدف الذي يؤهل هذا المقرر الطالب له.';
+
+// PMI Certifications.
 $string['exam_pmp'] = 'PMP® - إدارة المشاريع الاحترافية';
 $string['exam_capm'] = 'CAPM® - مساعد معتمد في إدارة المشاريع';
 $string['exam_pmi_acp'] = 'PMI-ACP® - الممارس المعتمد لإدارة المشاريع الرشيقة';
 $string['exam_pmi_rmp'] = 'PMI-RMP® - محترف إدارة المخاطر';
 $string['exam_pmi_pba'] = 'PMI-PBA® - محترف تحليل الأعمال';
 $string['exam_pgmp'] = 'PgMP® - محترف إدارة البرامج';
+$string['exam_pmi_custom'] = 'مسار مخصص في إدارة المشاريع';
+
+// Medical Certifications.
+$string['exam_med_board'] = 'البورد الطبي / ترخيص الممارسة الطبية';
+$string['exam_med_rn'] = 'التمريض الإكلينيكي المعتمد (RN)';
+$string['exam_med_bls_acls'] = 'الإنعاش القلبي والرعاية الحرجة (BLS / ACLS)';
+$string['exam_med_fellow'] = 'الزمالة الطبية السريرية والتخصص الدقيق';
+$string['exam_med_bps'] = 'بورد التخصصات الصيدلانية (BPS)';
+$string['exam_med_admin'] = 'إدارة الجودة والمنشآت الصحية (CPHQ)';
+$string['exam_med_custom'] = 'مسار طبي / صحي مخصص';
+
+// Computer / IT Certifications.
+$string['exam_cs_aws'] = 'هندسة الحوسبة السحابية والديف أوبس (AWS / Cloud)';
+$string['exam_cs_cisco'] = 'هندسة الشبكات المعتمدة (Cisco CCNA/CCNP)';
+$string['exam_cs_security'] = 'الأمن السيبراني وحماية البيانات (Security+ / CEH)';
+$string['exam_cs_kubernetes'] = 'الحاويات وهندسة كوبرنيتيس (CKA / CKAD)';
+$string['exam_cs_data_ai'] = 'علوم البيانات والذكاء الاصطناعي (Data Science & AI)';
+$string['exam_cs_fullstack'] = 'تطوير البرمجيات المتكاملة (Full-Stack Engineering)';
+$string['exam_cs_custom'] = 'مسار تقني مخصص';
+
+// Language Certifications.
+$string['exam_lang_ielts_toefl'] = 'إتقان اللغة الإنجليزية (IELTS / TOEFL)';
+$string['exam_lang_translator'] = 'الترجمة المهنية والقانونية المعتمدة';
+$string['exam_lang_cefr'] = 'المستوى اللغوي المتقدم (CEFR C1 / C2)';
+$string['exam_lang_tefl'] = 'تدريس اللغة الإنجليزية المعتمد (TEFL / TESOL)';
+$string['exam_lang_custom'] = 'مسار لغات مخصص';
+
+// Business Certifications.
+$string['exam_biz_cfa'] = 'CFA® - محلل مالي معتمد';
+$string['exam_biz_cpa'] = 'CPA - محاسب قانوني معتمد';
+$string['exam_biz_shrm'] = 'إدارة الموارد البشرية الاحترافية (SHRM)';
+$string['exam_biz_sixsigma'] = 'منهجية لين ستة سيجما (Lean Six Sigma)';
+$string['exam_biz_cma'] = 'CMA - محاسب إداري معتمد';
+$string['exam_biz_custom'] = 'مسار أعمال مخصص';
+
+// General Certifications.
+$string['exam_gen_cv'] = 'سيرة ذاتية مهنية شاملة';
+$string['exam_gen_portfolio'] = 'سجل الخبرات والمحفظة المهنية';
+$string['exam_gen_custom'] = 'مسار مهني مخصص آخر';
 $string['exam_custom'] = 'سيرة ذاتية عامة / مخصصة';
+
+$string['custom_cert_name'] = 'عنوان الشهادة أو المسار المخصص';
+$string['custom_cert_name_help'] = 'اختياري. إذا اخترت مساراً مخصصاً أو أردت تخصيص اسم الشهادة الظاهرة للطالب، اكتبه هنا.';
+
 $string['contact_hours'] = 'ساعات الاتصال المعتمدة';
 $string['contact_hours_help'] = 'عدد الساعات التدريبية الممنوحة عند إتمام الدورة (مثلاً 35 ساعة لـ PMP).';
 $string['provider_name'] = 'اسم الجهة التعليمية المزودة';
-$string['provider_name_help'] = 'اسم المنظمة أو المعهد التعليمي الذي سيظهر في طلب اعتماد PMI الرسمي.';
+$string['provider_name_help'] = 'اسم المنظمة أو المعهد التعليمي الذي سيظهر في طلب الاعتماد الرسمي.';
 $string['webhook_url_override'] = 'تجاوز رابط Webhook';
 $string['webhook_url_override_help'] = 'اتركه فارغاً لاستخدام الرابط العام المحدد في إعدادات الموقع.';
-$string['custom_prompt'] = 'البرومبت المخصص للنشاط (AI Prompt)';
-$string['custom_prompt_help'] = 'يمكنك هنا كتابة تعليمات وبرومبت مخصص للذكاء الاصطناعي يناسب طبيعة وشهادة هذا الكورس. إذا تُرك فارغاً سيتم استخدام البرومبت الافتراضي للموقع.';
+$string['custom_prompt'] = 'البرومبت المخصص للنشاط (اختياري)';
+$string['custom_prompt_help'] = 'يمكنك كتابة برومبت وتعليمات مخصصة للذكاء الاصطناعي لهذا الكورس. إذا تُرك فارغاً سيتم تطبيق البرومبت الجاهز المتخصص للمجال والشهادة المختارة تلقائياً.';
 
 // Student UI strings.
-$string['header_badge'] = 'مساعد طلبات PMI';
-$string['header_subtitle'] = 'قم بتجميع مخرجات التعلم وخبرات مشاريعك لصياغة طلب PMI الرسمي باحترافية.';
+$string['header_badge'] = 'مساعد طلبات الاعتماد';
+$string['header_subtitle'] = 'قم بتجميع مؤهلاتك ومخرجات التعلم وخبرات مشاريعك لصياغة طلب رسمي وسيرة ذاتية باحترافية.';
 $string['step_personal_title'] = '1. معلومات المرشح (Candidate Information)';
 $string['candidate_name'] = 'الاسم الكامل';
 $string['candidate_email'] = 'البريد الإلكتروني';

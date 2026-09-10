@@ -24,13 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'PMI Application & CV Builder';
-$string['modulename'] = 'PMI Application & CV Builder';
-$string['modulenameplural'] = 'PMI Application & CV Builders';
-$string['modulename_help'] = 'The PMI Application & CV Builder helps students assemble their certification application project experience, process it with AI via an n8n webhook, review the formatted application, and export a clean PDF.';
-$string['pluginadministration'] = 'PMI Application & CV Builder administration';
-$string['cv:addinstance'] = 'Add a new PMI Application & CV Builder activity';
-$string['cv:view'] = 'View PMI Application & CV Builder';
+$string['pluginname'] = 'Application & CV Builder';
+$string['modulename'] = 'Application & CV Builder';
+$string['modulenameplural'] = 'Application & CV Builders';
+$string['modulename_help'] = 'The Application & CV Builder helps students assemble their qualifications, certifications, and project experiences, process them with AI via an n8n webhook, review the formatted write-ups, and export a clean PDF dossier.';
+$string['pluginadministration'] = 'Application & CV Builder administration';
+$string['cv:addinstance'] = 'Add a new Application & CV Builder activity';
+$string['cv:view'] = 'View Application & CV Builder';
 $string['cv:submit'] = 'Submit data for AI processing';
 
 // Admin settings.
@@ -42,31 +42,85 @@ $string['default_auth_token'] = 'Bearer Auth Token';
 $string['default_auth_token_desc'] = 'Optional Bearer token or secret to pass in the Authorization header to n8n.';
 
 // Activity settings form.
-$string['activity_settings'] = 'Exam & Certification Configuration';
-$string['exam_type'] = 'Target PMI Certification';
-$string['exam_type_help'] = 'Select the certification this course prepares the student for.';
-$string['exam_type_desc'] = 'Select the certification this course prepares the student for.';
+$string['activity_settings'] = 'Certification & Track Configuration';
+$string['field_type'] = 'Professional Track / Domain';
+$string['field_type_help'] = 'Select the professional field or industry track this activity is tailored for. Each domain provides tailored certification options and specialized pre-made AI prompts.';
+$string['field_pmi'] = 'Project Management (PMI®)';
+$string['field_medical'] = 'Healthcare & Medical';
+$string['field_computer'] = 'Information Technology & Computing';
+$string['field_languages'] = 'Languages & Translation';
+$string['field_business'] = 'Business & Finance';
+$string['field_general'] = 'General Professional / Other';
+
+$string['exam_type'] = 'Target Certification / Track';
+$string['exam_type_help'] = 'Select the target certification or professional track this course prepares the student for.';
+$string['exam_type_desc'] = 'Select the target certification or professional track this course prepares the student for.';
+
+// PMI Certifications.
 $string['exam_pmp'] = 'PMP® - Project Management Professional';
 $string['exam_capm'] = 'CAPM® - Certified Associate in Project Management';
 $string['exam_pmi_acp'] = 'PMI-ACP® - Agile Certified Practitioner';
 $string['exam_pmi_rmp'] = 'PMI-RMP® - Risk Management Professional';
 $string['exam_pmi_pba'] = 'PMI-PBA® - Professional in Business Analysis';
 $string['exam_pgmp'] = 'PgMP® - Program Management Professional';
+$string['exam_pmi_custom'] = 'Custom PMI Track';
+
+// Medical Certifications.
+$string['exam_med_board'] = 'Medical Licensing / Specialty Board Certification';
+$string['exam_med_rn'] = 'Registered Nurse (RN) / Clinical Nursing Practice';
+$string['exam_med_bls_acls'] = 'BLS / ACLS / Resuscitation Specialist';
+$string['exam_med_fellow'] = 'Clinical Fellowship / Sub-specialty Board';
+$string['exam_med_bps'] = 'Board of Pharmacy Specialties (BPS)';
+$string['exam_med_admin'] = 'Healthcare Quality & Administration (CPHQ)';
+$string['exam_med_custom'] = 'Custom Medical Track';
+
+// Computer / IT Certifications.
+$string['exam_cs_aws'] = 'AWS Cloud Solutions Architect / DevOps';
+$string['exam_cs_cisco'] = 'Cisco Certified Network Associate/Professional (CCNA/CCNP)';
+$string['exam_cs_security'] = 'CompTIA Security+ / Cyber Security Specialist';
+$string['exam_cs_kubernetes'] = 'Kubernetes & Cloud Native (CKA/CKAD)';
+$string['exam_cs_data_ai'] = 'Data Science & AI / Machine Learning Engineer';
+$string['exam_cs_fullstack'] = 'Full-Stack Software Engineering';
+$string['exam_cs_custom'] = 'Custom IT Track';
+
+// Language Certifications.
+$string['exam_lang_ielts_toefl'] = 'IELTS / TOEFL English Proficiency Preparation';
+$string['exam_lang_translator'] = 'Certified Legal / Technical Translator';
+$string['exam_lang_cefr'] = 'CEFR C1 / C2 Advanced Language Proficiency';
+$string['exam_lang_tefl'] = 'TEFL / TESOL English Teaching Certification';
+$string['exam_lang_custom'] = 'Custom Language Track';
+
+// Business Certifications.
+$string['exam_biz_cfa'] = 'CFA® - Chartered Financial Analyst';
+$string['exam_biz_cpa'] = 'CPA - Certified Public Accountant';
+$string['exam_biz_shrm'] = 'SHRM-CP / SHRM-SCP (Human Resources)';
+$string['exam_biz_sixsigma'] = 'Lean Six Sigma (Green / Black Belt)';
+$string['exam_biz_cma'] = 'CMA - Certified Management Accountant';
+$string['exam_biz_custom'] = 'Custom Business Track';
+
+// General Certifications.
+$string['exam_gen_cv'] = 'General Professional CV & Resume';
+$string['exam_gen_portfolio'] = 'Career Experience & Project Portfolio';
+$string['exam_gen_custom'] = 'Custom Track / Other';
 $string['exam_custom'] = 'General / Custom CV';
+
+$string['custom_cert_name'] = 'Custom Track / Certification Title';
+$string['custom_cert_name_help'] = 'Optional. If you selected a custom option or wish to override the certification display name, enter it here.';
+
 $string['contact_hours'] = 'Qualifying Contact Hours';
 $string['contact_hours_help'] = 'Number of contact/training hours granted upon course completion (e.g., 35 for PMP, 21 for PMI-ACP).';
 $string['provider_name'] = 'Training Provider Name';
-$string['provider_name_help'] = 'The organization name appearing on the formal PMI application education record.';
+$string['provider_name_help'] = 'The organization name appearing on the formal application education record.';
 $string['webhook_url_override'] = 'Webhook URL Override';
 $string['webhook_url_override_help'] = 'Leave empty to use the site-wide default n8n webhook URL.';
-$string['custom_prompt'] = 'Custom AI Prompt';
-$string['custom_prompt_help'] = 'Optionally enter custom instructions or a system prompt for the AI tailored to this course and certification. If left empty, the site default will be used.';
+$string['custom_prompt'] = 'Custom AI Prompt (Optional)';
+$string['custom_prompt_help'] = 'Optionally enter custom instructions or a system prompt for the AI tailored to this course. If left empty, the built-in pre-made prompt for the selected domain track will be used automatically.';
 $string['default_prompt'] = 'Default System AI Prompt';
 $string['default_prompt_desc'] = 'Default AI instructions to send to n8n if no custom prompt is set on the activity instance.';
 
 // Student UI strings.
-$string['header_badge'] = 'PMI Application Assistant';
-$string['header_subtitle'] = 'Assemble your course learning outcomes and project experience into an official PMI application write-up.';
+$string['header_badge'] = 'Application Assistant';
+$string['header_subtitle'] = 'Assemble your qualifications, learning outcomes, and project experience into an official application dossier.';
 $string['step_personal_title'] = '1. Candidate Information';
 $string['candidate_name'] = 'Full Name';
 $string['candidate_email'] = 'Email';
