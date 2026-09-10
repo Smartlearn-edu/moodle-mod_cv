@@ -607,8 +607,8 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                         args: {
                             cmid: cmid,
                             profile: profile,
-                            course_info: courseInfo,
-                            projects: projects
+                            projects: projects,
+                            course_info: courseInfo
                         }
                     }])[0].then(function(res) {
                         if (res.status && res.outputjson) {

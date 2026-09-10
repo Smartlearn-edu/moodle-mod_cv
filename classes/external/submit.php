@@ -50,12 +50,6 @@ class submit extends external_api {
                 'degree_startdate' => new external_value(PARAM_TEXT, 'Degree start date', VALUE_DEFAULT, ''),
                 'degree_enddate' => new external_value(PARAM_TEXT, 'Degree end/graduation date', VALUE_DEFAULT, ''),
             ]),
-            'course_info' => new external_single_structure([
-                'id' => new external_value(PARAM_INT, 'Course ID', VALUE_DEFAULT, 0),
-                'name' => new external_value(PARAM_TEXT, 'Course title/fullname', VALUE_DEFAULT, ''),
-                'startdate' => new external_value(PARAM_TEXT, 'Course start date', VALUE_DEFAULT, ''),
-                'enddate' => new external_value(PARAM_TEXT, 'Course end/completion date', VALUE_DEFAULT, ''),
-            ], 'Course information', VALUE_DEFAULT, []),
             'projects' => new external_multiple_structure(
                 new external_single_structure([
                     'title' => new external_value(PARAM_TEXT, 'Project title/name'),
@@ -87,6 +81,12 @@ class submit extends external_api {
                     'notes' => new external_value(PARAM_RAW, 'Legacy tasks and notes', VALUE_DEFAULT, ''),
                 ])
             ),
+            'course_info' => new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'Course ID', VALUE_DEFAULT, 0),
+                'name' => new external_value(PARAM_TEXT, 'Course title/fullname', VALUE_DEFAULT, ''),
+                'startdate' => new external_value(PARAM_TEXT, 'Course start date', VALUE_DEFAULT, ''),
+                'enddate' => new external_value(PARAM_TEXT, 'Course end/completion date', VALUE_DEFAULT, ''),
+            ], 'Course information', VALUE_DEFAULT, []),
         ]);
     }
 
