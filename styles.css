@@ -1,27 +1,113 @@
-/* Scoped styles for mod_cv */
-.path-mod-cv .mod-cv-container {
-    max-width: 960px;
-    margin: 0 auto 40px auto;
+/* Scoped styles for mod_cv - SmartLearn Theme Compatible (Light & Dark Mode) */
+
+.path-mod-cv {
+    --cv-bg: var(--smartlearn-card-bg, #ffffff);
+    --cv-border: var(--smartlearn-card-border, #e2e8f0);
+    --cv-header-bg: #f8fafc;
+    --cv-text: var(--smartlearn-text, #1e293b);
+    --cv-text-muted: var(--smartlearn-text-muted, #64748b);
+    --cv-primary: var(--smartlearn-primary, #2563eb);
+    --cv-radius: var(--smartlearn-radius, 12px);
+    --cv-info-bg: #f1f5f9;
+    --cv-nested-card-bg: #ffffff;
+    --cv-nested-card-border: #cbd5e1;
+    --cv-input-bg: var(--smartlearn-input-bg, #ffffff);
+    --cv-input-border: var(--smartlearn-input-border, #cbd5e1);
+    --cv-input-text: var(--smartlearn-text, #1e293b);
+    --cv-output-bg: #f8fafc;
+    --cv-formatted-bg: #ffffff;
+    --cv-formatted-border: #e2e8f0;
+    --cv-overlay-bg: rgba(255, 255, 255, 0.92);
+    --cv-badge-exam-bg: #e0e7ff;
+    --cv-badge-exam-text: #3730a3;
+    --cv-badge-exam-border: rgba(99, 102, 241, 0.25);
 }
 
+/* ==========================================================================
+   Dark Mode Variable Overrides for theme_smartlearn & Bootstrap 5
+   ========================================================================== */
+html[data-smartlearn-mode="dark"] .path-mod-cv,
+html[data-bs-theme="dark"] .path-mod-cv,
+[data-bs-theme="dark"] .path-mod-cv,
+body.smartlearn-dark .path-mod-cv,
+body.theme-dark .path-mod-cv {
+    --cv-bg: var(--smartlearn-card-bg, #1e293b);
+    --cv-border: var(--smartlearn-card-border, rgba(255, 255, 255, 0.12));
+    --cv-header-bg: rgba(15, 23, 42, 0.5);
+    --cv-text: var(--smartlearn-text, #f8fafc);
+    --cv-text-muted: var(--smartlearn-text-muted, #94a3b8);
+    --cv-primary: var(--smartlearn-primary, #60a5fa);
+    --cv-info-bg: rgba(15, 23, 42, 0.55);
+    --cv-nested-card-bg: rgba(15, 23, 42, 0.45);
+    --cv-nested-card-border: rgba(255, 255, 255, 0.12);
+    --cv-input-bg: var(--smartlearn-input-bg, rgba(15, 23, 42, 0.65));
+    --cv-input-border: var(--smartlearn-input-border, rgba(255, 255, 255, 0.2));
+    --cv-input-text: var(--smartlearn-text, #f8fafc);
+    --cv-output-bg: rgba(15, 23, 42, 0.55);
+    --cv-formatted-bg: rgba(30, 41, 59, 0.7);
+    --cv-formatted-border: rgba(255, 255, 255, 0.12);
+    --cv-overlay-bg: rgba(15, 23, 42, 0.88);
+    --cv-badge-exam-bg: rgba(99, 102, 241, 0.25);
+    --cv-badge-exam-text: #c7d2fe;
+    --cv-badge-exam-border: rgba(165, 180, 252, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-smartlearn-mode="light"]):not([data-bs-theme="light"]) .path-mod-cv {
+        --cv-bg: var(--smartlearn-card-bg, #1e293b);
+        --cv-border: var(--smartlearn-card-border, rgba(255, 255, 255, 0.12));
+        --cv-header-bg: rgba(15, 23, 42, 0.5);
+        --cv-text: var(--smartlearn-text, #f8fafc);
+        --cv-text-muted: var(--smartlearn-text-muted, #94a3b8);
+        --cv-primary: var(--smartlearn-primary, #60a5fa);
+        --cv-info-bg: rgba(15, 23, 42, 0.55);
+        --cv-nested-card-bg: rgba(15, 23, 42, 0.45);
+        --cv-nested-card-border: rgba(255, 255, 255, 0.12);
+        --cv-input-bg: var(--smartlearn-input-bg, rgba(15, 23, 42, 0.65));
+        --cv-input-border: var(--smartlearn-input-border, rgba(255, 255, 255, 0.2));
+        --cv-input-text: var(--smartlearn-text, #f8fafc);
+        --cv-output-bg: rgba(15, 23, 42, 0.55);
+        --cv-formatted-bg: rgba(30, 41, 59, 0.7);
+        --cv-formatted-border: rgba(255, 255, 255, 0.12);
+        --cv-overlay-bg: rgba(15, 23, 42, 0.88);
+        --cv-badge-exam-bg: rgba(99, 102, 241, 0.25);
+        --cv-badge-exam-text: #c7d2fe;
+        --cv-badge-exam-border: rgba(165, 180, 252, 0.3);
+    }
+}
+
+/* ==========================================================================
+   Layout & Container
+   ========================================================================== */
+.path-mod-cv .mod-cv-container {
+    max-width: 980px;
+    margin: 0 auto 40px auto;
+    color: var(--cv-text);
+}
+
+/* ==========================================================================
+   Main Cards
+   ========================================================================== */
 .path-mod-cv .cv-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: var(--cv-bg);
+    border: 1px solid var(--cv-border);
+    border-radius: var(--cv-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     margin-bottom: 24px;
     overflow: hidden;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .path-mod-cv .cv-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
 .path-mod-cv .cv-card-header {
-    background: #f8fafc;
+    background: var(--cv-header-bg);
     padding: 16px 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--cv-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -31,7 +117,7 @@
     margin: 0;
     font-size: 1.15rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--cv-text);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -39,33 +125,45 @@
 
 .path-mod-cv .cv-card-body {
     padding: 24px;
+    color: var(--cv-text);
 }
 
+/* ==========================================================================
+   Badges
+   ========================================================================== */
 .path-mod-cv .cv-badge-exam {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--cv-badge-exam-bg);
+    color: var(--cv-badge-exam-text);
+    border: 1px solid var(--cv-badge-exam-border);
     font-weight: 700;
     font-size: 0.85rem;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 9999px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
+/* ==========================================================================
+   Info Grid (Course Details)
+   ========================================================================== */
 .path-mod-cv .cv-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
-    background: #f1f5f9;
+    background: var(--cv-info-bg);
     padding: 16px;
     border-radius: 8px;
+    border: 1px solid var(--cv-border);
 }
 
 .path-mod-cv .cv-info-item label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #64748b;
+    color: var(--cv-text-muted);
     margin-bottom: 4px;
     display: block;
     font-weight: 600;
@@ -74,16 +172,20 @@
 .path-mod-cv .cv-info-item span {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--cv-text);
 }
 
+/* ==========================================================================
+   Project Cards (Dynamic)
+   ========================================================================== */
 .path-mod-cv .cv-project-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--cv-nested-card-bg);
+    border: 1px solid var(--cv-nested-card-border);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .path-mod-cv .cv-project-header {
@@ -92,36 +194,117 @@
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--cv-border);
+}
+
+.path-mod-cv .cv-project-title {
+    color: var(--cv-text);
+    font-size: 1.05rem;
 }
 
 .path-mod-cv .cv-section-title {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #2563eb;
+    color: var(--cv-primary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: 18px 0 12px 0;
     padding-bottom: 6px;
-    border-bottom: 1px dashed #e2e8f0;
+    border-bottom: 1px dashed var(--cv-border);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.path-mod-cv .cv-project-card label.form-label {
+.path-mod-cv label.form-label {
     font-size: 0.875rem;
     font-weight: 600;
     margin-bottom: 4px;
-    color: #334155;
+    color: var(--cv-text);
 }
 
+.path-mod-cv .form-text.text-muted,
+.path-mod-cv small.text-muted {
+    color: var(--cv-text-muted) !important;
+}
+
+/* ==========================================================================
+   Form Controls (Inputs, Selects, Textareas)
+   ========================================================================== */
+.path-mod-cv .form-control,
+.path-mod-cv .form-select,
+.path-mod-cv select.custom-select,
+.path-mod-cv textarea.form-control {
+    background-color: var(--cv-input-bg);
+    border-color: var(--cv-input-border);
+    color: var(--cv-input-text);
+    border-radius: 6px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.path-mod-cv .form-control:focus,
+.path-mod-cv .form-select:focus,
+.path-mod-cv select.custom-select:focus,
+.path-mod-cv textarea.form-control:focus {
+    background-color: var(--cv-input-bg);
+    border-color: var(--cv-primary);
+    color: var(--cv-input-text);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
+}
+
+.path-mod-cv .form-control:disabled,
+.path-mod-cv .form-control[readonly] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Dark mode form control helpers */
+html[data-smartlearn-mode="dark"] .path-mod-cv .form-control::placeholder,
+html[data-bs-theme="dark"] .path-mod-cv .form-control::placeholder,
+[data-bs-theme="dark"] .path-mod-cv .form-control::placeholder,
+body.smartlearn-dark .path-mod-cv .form-control::placeholder,
+body.theme-dark .path-mod-cv .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+html[data-smartlearn-mode="dark"] .path-mod-cv select.form-select option,
+html[data-bs-theme="dark"] .path-mod-cv select.form-select option,
+[data-bs-theme="dark"] .path-mod-cv select.form-select option,
+html[data-smartlearn-mode="dark"] .path-mod-cv select.custom-select option,
+html[data-bs-theme="dark"] .path-mod-cv select.custom-select option,
+[data-bs-theme="dark"] .path-mod-cv select.custom-select option,
+body.smartlearn-dark .path-mod-cv select option,
+body.theme-dark .path-mod-cv select option {
+    background-color: #1e293b;
+    color: #f8fafc;
+}
+
+/* Invert date picker calendar icon in dark mode */
+html[data-smartlearn-mode="dark"] .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator,
+html[data-bs-theme="dark"] .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator,
+[data-bs-theme="dark"] .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator,
+body.smartlearn-dark .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator,
+body.theme-dark .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-smartlearn-mode="light"]):not([data-bs-theme="light"]) .path-mod-cv input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+}
+
+/* ==========================================================================
+   Output & Review Section
+   ========================================================================== */
 .path-mod-cv .cv-output-box {
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
+    background: var(--cv-output-bg);
+    border: 1px solid var(--cv-border);
     border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
     position: relative;
 }
 
@@ -129,22 +312,83 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.path-mod-cv .cv-summary-content {
+    color: var(--cv-text);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.path-mod-cv .cv-formatted-output {
+    background-color: var(--cv-formatted-bg) !important;
+    border: 1px solid var(--cv-formatted-border) !important;
+    color: var(--cv-text) !important;
+    border-radius: 6px;
 }
 
 .path-mod-cv .cv-copy-btn {
     font-size: 0.8rem;
-    padding: 4px 10px;
+    padding: 4px 12px;
+    border-radius: 4px;
 }
 
+/* Dark mode copy button adjustment */
+html[data-smartlearn-mode="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary,
+html[data-bs-theme="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary,
+[data-bs-theme="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary,
+body.smartlearn-dark .path-mod-cv .cv-copy-btn.btn-outline-secondary,
+body.theme-dark .path-mod-cv .cv-copy-btn.btn-outline-secondary {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #e2e8f0;
+}
+
+html[data-smartlearn-mode="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary:hover,
+html[data-bs-theme="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary:hover,
+[data-bs-theme="dark"] .path-mod-cv .cv-copy-btn.btn-outline-secondary:hover,
+body.smartlearn-dark .path-mod-cv .cv-copy-btn.btn-outline-secondary:hover,
+body.theme-dark .path-mod-cv .cv-copy-btn.btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   Loading Overlay
+   ========================================================================== */
 .path-mod-cv .cv-loading-overlay {
     display: none;
     text-align: center;
     padding: 30px;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--cv-overlay-bg);
     border-radius: 8px;
+    border: 1px solid var(--cv-border);
 }
 
 .path-mod-cv .cv-loading-overlay.active {
     display: block;
 }
+
+/* ==========================================================================
+   Alerts in Dark Mode
+   ========================================================================== */
+html[data-smartlearn-mode="dark"] .path-mod-cv .alert-info,
+html[data-bs-theme="dark"] .path-mod-cv .alert-info,
+[data-bs-theme="dark"] .path-mod-cv .alert-info,
+body.smartlearn-dark .path-mod-cv .alert-info,
+body.theme-dark .path-mod-cv .alert-info {
+    background-color: rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.35);
+    color: #7dd3fc;
+}
+
+html[data-smartlearn-mode="dark"] .path-mod-cv .alert-danger,
+html[data-bs-theme="dark"] .path-mod-cv .alert-danger,
+[data-bs-theme="dark"] .path-mod-cv .alert-danger,
+body.smartlearn-dark .path-mod-cv .alert-danger,
+body.theme-dark .path-mod-cv .alert-danger {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+

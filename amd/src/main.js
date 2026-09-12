@@ -83,7 +83,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
         var html = '<div class="cv-project-card" id="project_card_' + idx + '">' +
             '<div class="cv-project-header">' +
-            '   <h5 class="mb-0 text-dark font-weight-bold"><i class="fa fa-folder-open text-primary"></i> Project #' + idx + '</h5>' +
+            '   <h5 class="mb-0 cv-project-title font-weight-bold"><i class="fa fa-folder-open text-primary"></i> Project #' + idx + '</h5>' +
             '   <button type="button" class="btn btn-outline-danger btn-sm btn-remove-project" data-target="#project_card_' + idx + '">' +
             '       <i class="fa fa-trash"></i> Remove' +
             '   </button>' +
@@ -228,7 +228,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 '       <i class="fa fa-clipboard"></i> Copy' +
                 '   </button>' +
                 '</div>' +
-                '<div id="summary_content" class="text-dark">' + escapeHtml(data.summary) + '</div>' +
+                '<div id="summary_content" class="cv-summary-content">' + escapeHtml(data.summary) + '</div>' +
                 '</div>';
         }
 
@@ -240,20 +240,20 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
                 html += '<div class="cv-output-box">' +
                     '<div class="cv-output-header">' +
-                    '   <h5 class="mb-0 font-weight-bold text-dark"><i class="fa fa-check-square text-success"></i> ' + escapeHtml(proj.title || ('Project #' + (i + 1))) + '</h5>' +
+                    '   <h5 class="mb-0 font-weight-bold cv-project-title"><i class="fa fa-check-square text-success"></i> ' + escapeHtml(proj.title || ('Project #' + (i + 1))) + '</h5>' +
                     '   <button type="button" class="btn btn-outline-secondary btn-sm cv-copy-btn" data-copy-target="#' + pId + '">' +
                     '       <i class="fa fa-clipboard"></i> Copy' +
                     '   </button>' +
                     '</div>' +
                     (proj.role ? '<p class="text-muted small mb-2"><strong>Role:</strong> ' + escapeHtml(proj.role) + '</p>' : '') +
-                    '<div id="' + pId + '" style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;" class="bg-white p-3 border rounded">' +
+                    '<div id="' + pId + '" style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;" class="cv-formatted-output p-3 border rounded">' +
                     escapeHtml(formattedText) +
                     '</div>' +
                     '</div>';
             });
         } else if (typeof data === 'string') {
             html += '<div class="cv-output-box">' +
-                '<div id="raw_out" style="white-space: pre-wrap;" class="bg-white p-3 border rounded">' + escapeHtml(data) + '</div>' +
+                '<div id="raw_out" style="white-space: pre-wrap;" class="cv-formatted-output p-3 border rounded">' + escapeHtml(data) + '</div>' +
                 '</div>';
         }
 
