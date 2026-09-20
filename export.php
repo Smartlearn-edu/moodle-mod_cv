@@ -200,6 +200,35 @@ if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {
             $metaitems[] = '<strong>Methodology:</strong> ' . htmlspecialchars(ucfirst($rawproj['methodology']));
         }
 
+        $configuredfields = \mod_cv\fields_manager::get_fields($cv);
+        $standardmetakeys = ['role', 'jobtitle', 'industry', 'organization', 'startdate', 'enddate', 'iscurrent', 'methodology'];
+
+        // Additional custom metadata fields (single-line or select or number).
+        $customtextfields = [];
+        $customareafields = [];
+
+        foreach ($configuredfields as $f) {
+            if (empty($f['enabled']) || in_array($f['key'], $standardmetakeys, true)) {
+                continue;
+            }
+            $val = $rawproj[$f['key']] ?? null;
+            if ($val === null && !empty($rawproj['custom_fields']) && is_array($rawproj['custom_fields'])) {
+                foreach ($rawproj['custom_fields'] as $cf) {
+                    if (($cf['key'] ?? '') === $f['key']) {
+                        $val = $cf['value'] ?? '';
+                        break;
+                    }
+                }
+            }
+            if ($val !== null && trim((string) $val) !== '') {
+                if ($f['type'] === \mod_cv\fields_manager::TYPE_TEXTAREA) {
+                    $customareafields[] = '<strong>' . htmlspecialchars($f['label']) . ':</strong> ' . nl2br(htmlspecialchars(trim((string) $val)));
+                } else {
+                    $metaitems[] = '<strong>' . htmlspecialchars($f['label']) . ':</strong> ' . htmlspecialchars(trim((string) $val));
+                }
+            }
+        }
+
         if (!empty($metaitems)) {
             $html .= '<p style="color: #475569; font-size: 8.5pt; margin-bottom: 6px;">' . implode(' &bull; ', $metaitems) . '</p>';
         }
@@ -208,6 +237,11 @@ if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {
         if (is_string($formatteddesc)) {
             $html .= '<p>' . nl2br(htmlspecialchars($formatteddesc)) . '</p>';
         }
+
+        foreach ($customareafields as $caf) {
+            $html .= '<p style="margin-top: 6px; font-size: 9pt;">' . $caf . '</p>';
+        }
+
         $html .= '</div>';
     }
 } else if (is_string($aioutput)) {

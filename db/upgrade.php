@@ -197,5 +197,27 @@ function xmldb_cv_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026092002, 'cv');
     }
 
+    if ($oldversion < 2026092004) {
+        $tablecv = new xmldb_table('cv');
+
+        // Define field projectfields to be added to cv table.
+        $projectfields = new xmldb_field(
+            'projectfields',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'maxattempts'
+        );
+        if (!$dbman->field_exists($tablecv, $projectfields)) {
+            $dbman->add_field($tablecv, $projectfields);
+        }
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026092004, 'cv');
+    }
+
     return true;
 }

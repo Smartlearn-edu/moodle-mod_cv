@@ -194,31 +194,47 @@ class ai_processor {
             $user .= "- Name: " . $profile['name'] . "\n\n";
         }
 
+        $configuredfields = \mod_cv\fields_manager::get_fields($cv);
+
         $user .= "Candidate Project Experiences (" . count($projects) . " projects):\n";
         foreach ($projects as $index => $proj) {
             $num = $index + 1;
             $user .= "--- Project #{$num} ---\n";
-            $user .= "Title: " . ($proj['title'] ?? '') . "\n";
-            $user .= "Industry: " . ($proj['industry'] ?? 'N/A') . "\n";
-            $user .= "Organization: " . ($proj['organization'] ?? 'N/A') . "\n";
-            $user .= "Job Title: " . ($proj['jobtitle'] ?? '') . "\n";
-            $user .= "Role: " . ($proj['role'] ?? '') . "\n";
-            $user .= "Approach/Methodology: " . ($proj['methodology'] ?? 'predictive') . "\n";
-            $user .= "Timeline: " . ($proj['startdate'] ?? '') . " to ";
-            $user .= (!empty($proj['iscurrent']) ? "Present (Ongoing)" : ($proj['enddate'] ?? '')) . "\n";
-            $user .= "Objective: " . ($proj['objective'] ?? '') . "\n";
-            $user .= "Scope: " . ($proj['scope'] ?? '') . "\n";
-            $user .= "Responsibilities: " . ($proj['responsibilities'] ?? '') . "\n";
-            $user .= "Deliverables: " . ($proj['deliverables'] ?? '') . "\n";
-            $user .= "Stakeholders Managed: " . ($proj['stakeholders'] ?? 'N/A') . "\n";
-            $user .= "Team & Resources: " . ($proj['teamresources'] ?? 'N/A') . "\n";
-            $user .= "Challenges / Risks / Issues: " . ($proj['challenges'] ?? '') . "\n";
-            $user .= "Changes Managed: " . ($proj['changes'] ?? 'N/A') . "\n";
-            $user .= "Outcomes: " . ($proj['outcomes'] ?? '') . "\n";
-            $user .= "Measurable Results: " . ($proj['measurableresults'] ?? 'N/A') . "\n";
-            $user .= "Closure / Handover: " . ($proj['closure'] ?? 'N/A') . "\n";
-            if (!empty($proj['additionalinfo'])) {
-                $user .= "Additional Info: " . $proj['additionalinfo'] . "\n";
+
+            $handledkeys = [];
+            foreach ($configuredfields as $f) {
+                if (empty($f['enabled'])) {
+                    continue;
+                }
+                $k = $f['key'];
+                if ($k === 'startdate' || $k === 'enddate' || $k === 'iscurrent') {
+                    if (!in_array('timeline', $handledkeys, true)) {
+                        $start = $proj['startdate'] ?? '';
+                        $iscur = !empty($proj['iscurrent']);
+                        $end = $iscur ? 'Present (Ongoing)' : ($proj['enddate'] ?? '');
+                        if ($start !== '' || $end !== '') {
+                            $user .= "Timeline: {$start} to {$end}\n";
+                        }
+                        $handledkeys[] = 'timeline';
+                    }
+                    continue;
+                }
+
+                $val = $proj[$k] ?? null;
+                if ($val === null && !empty($proj['custom_fields']) && is_array($proj['custom_fields'])) {
+                    foreach ($proj['custom_fields'] as $cf) {
+                        if (($cf['key'] ?? '') === $k) {
+                            $val = $cf['value'] ?? '';
+                            break;
+                        }
+                    }
+                }
+
+                if ($val !== null && trim((string) $val) !== '') {
+                    $user .= "{$f['label']}: " . trim((string) $val) . "\n";
+                } else if (!empty($f['required'])) {
+                    $user .= "{$f['label']}: N/A\n";
+                }
             }
             $user .= "\n";
         }

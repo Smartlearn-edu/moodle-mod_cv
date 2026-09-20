@@ -79,6 +79,16 @@ class submit extends external_api {
                     'closure' => new external_value(PARAM_RAW, 'Project closure / handover', VALUE_DEFAULT, ''),
                     'additionalinfo' => new external_value(PARAM_RAW, 'Additional information', VALUE_DEFAULT, ''),
                     'notes' => new external_value(PARAM_RAW, 'Legacy tasks and notes', VALUE_DEFAULT, ''),
+                    'custom_fields' => new external_multiple_structure(
+                        new external_single_structure([
+                            'key' => new external_value(PARAM_ALPHANUMEXT, 'Field key'),
+                            'label' => new external_value(PARAM_TEXT, 'Field label', VALUE_DEFAULT, ''),
+                            'value' => new external_value(PARAM_RAW, 'Field value', VALUE_DEFAULT, ''),
+                        ]),
+                        'Dynamic custom fields',
+                        VALUE_DEFAULT,
+                        []
+                    ),
                 ])
             ),
             'course_info' => new external_single_structure([
@@ -143,6 +153,19 @@ class submit extends external_api {
             'startdate' => '',
             'enddate' => '',
         ];
+
+        $processedprojects = [];
+        foreach ($params['projects'] as $proj) {
+            if (!empty($proj['custom_fields']) && is_array($proj['custom_fields'])) {
+                foreach ($proj['custom_fields'] as $cf) {
+                    if (!empty($cf['key']) && !isset($proj[$cf['key']])) {
+                        $proj[$cf['key']] = $cf['value'];
+                    }
+                }
+            }
+            $processedprojects[] = $proj;
+        }
+        $params['projects'] = $processedprojects;
 
         $rawjson = json_encode([
             'profile' => $profile,

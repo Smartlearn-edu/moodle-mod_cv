@@ -77,6 +77,18 @@ function cv_process_instance_data(stdClass $cv): void {
     } else {
         $cv->maxattempts = (int) $cv->maxattempts;
     }
+
+    if (!empty($cv->projectfields) && is_string($cv->projectfields)) {
+        $decoded = json_decode($cv->projectfields, true);
+        if (is_array($decoded)) {
+            $sanitized = \mod_cv\fields_manager::sanitize_fields($decoded);
+            $cv->projectfields = json_encode($sanitized, JSON_UNESCAPED_UNICODE);
+        } else {
+            $cv->projectfields = null;
+        }
+    } else {
+        $cv->projectfields = null;
+    }
 }
 
 /**

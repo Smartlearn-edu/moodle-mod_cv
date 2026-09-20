@@ -189,6 +189,8 @@ if ($showcourseeducation) {
 
 $projectstitle = $stepnum . '. ' . get_string('step_projects_title_content', 'mod_cv');
 
+$projectfields = \mod_cv\fields_manager::get_fields($cv);
+
 $templatedata = [
     'cmid' => $cm->id,
     'activityname' => format_string($cv->name),
@@ -225,6 +227,7 @@ $templatedata = [
     'is_pending' => $ispending,
     'export_url' => (new moodle_url('/mod/cv/export.php', ['id' => $cm->id]))->out(false),
     'initial_data_json' => json_encode([
+        'project_fields' => $projectfields,
         'saved_projects' => $savedprojects,
         'saved_course' => $savedcourse,
         'ai_output' => $aioutput,

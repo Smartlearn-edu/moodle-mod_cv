@@ -392,3 +392,46 @@ body.theme-dark .path-mod-cv .alert-danger {
     color: #fca5a5;
 }
 
+/* ==========================================================================
+   Activity Form - Project Fields Manager
+   ========================================================================== */
+.cv-fields-manager-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.cv-fields-table th {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #475569;
+    font-weight: 600;
+}
+
+.cv-fields-table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.cv-fields-table tr.table-secondary td {
+    opacity: 0.65;
+}
+
+.cv-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    opacity: 0.5;
+}
+
+#cvFieldModal.show {
+    z-index: 1050;
+}
+
+

@@ -39,7 +39,7 @@ class backup_cv_activity_structure_step extends backup_activity_structure_step {
             'name', 'intro', 'introformat', 'examtype', 'fieldtype', 'customcert',
             'aiprovider', 'contacthours', 'providername', 'webhookurl', 'customprompt',
             'showcandidateinfo', 'showcourseeducation', 'showreview', 'showsummary',
-            'maxattempts', 'timecreated', 'timemodified',
+            'maxattempts', 'projectfields', 'timecreated', 'timemodified',
         ]);
 
         $submissions = new backup_nested_element('submissions');

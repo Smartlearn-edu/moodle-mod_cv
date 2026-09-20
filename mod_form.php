@@ -137,6 +137,125 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setType('maxattempts', PARAM_INT);
         $mform->addHelpButton('maxattempts', 'max_attempts', 'mod_cv');
 
+        // Project Fields Configuration.
+        $mform->addElement('header', 'projectfieldsheader', get_string('project_fields_settings', 'mod_cv'));
+        $mform->addHelpButton('projectfieldsheader', 'project_fields_settings', 'mod_cv');
+
+        $mform->addElement('hidden', 'projectfields');
+        $mform->setType('projectfields', PARAM_RAW);
+
+        // Container element for interactive field management UI.
+        $fieldmanagerhtml = '
+        <div id="cv_project_fields_manager" class="cv-fields-manager-container mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn_add_custom_field">
+                        <i class="fa fa-plus"></i> ' . get_string('add_custom_field', 'mod_cv') . '
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btn_reset_default_fields">
+                        <i class="fa fa-refresh"></i> ' . get_string('reset_default_fields', 'mod_cv') . '
+                    </button>
+                </div>
+                <div class="text-muted small">
+                    <span class="badge badge-info bg-info text-white" id="cv_fields_count_badge">0 fields</span>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover cv-fields-table align-middle" id="cv_fields_table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 40px;" class="text-center">#</th>
+                            <th>' . get_string('field_label', 'mod_cv') . '</th>
+                            <th>' . get_string('field_key', 'mod_cv') . '</th>
+                            <th>' . get_string('field_type', 'mod_cv') . '</th>
+                            <th>' . get_string('field_section', 'mod_cv') . '</th>
+                            <th class="text-center">' . get_string('field_required', 'mod_cv') . '</th>
+                            <th class="text-center">' . get_string('status_active', 'mod_cv') . '</th>
+                            <th class="text-end" style="width: 140px;">' . get_string('actions') . '</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cv_fields_table_body">
+                        <!-- Populated by AMD Javascript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Field Edit/Create Modal -->
+            <div class="modal fade" id="cvFieldModal" tabindex="-1" aria-labelledby="cvFieldModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cvFieldModalLabel">' . get_string('add_custom_field', 'mod_cv') . '</h5>
+                            <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="' . get_string('closebuttontitle') . '">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="modal_field_original_key" value="">
+                            <div class="mb-3">
+                                <label for="modal_field_label" class="form-label font-weight-bold">' . get_string('field_label', 'mod_cv') . ' <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="modal_field_label" required placeholder="e.g. Project Budget">
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_field_key" class="form-label font-weight-bold">' . get_string('field_key', 'mod_cv') . ' <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="modal_field_key" required placeholder="e.g. project_budget">
+                                <small class="form-text text-muted">Lowercase letters, numbers, and underscores only.</small>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="modal_field_type" class="form-label font-weight-bold">' . get_string('field_type', 'mod_cv') . '</label>
+                                    <select class="form-select custom-select" id="modal_field_type">
+                                        <option value="text">' . get_string('type_text', 'mod_cv') . '</option>
+                                        <option value="textarea">' . get_string('type_textarea', 'mod_cv') . '</option>
+                                        <option value="select">' . get_string('type_select', 'mod_cv') . '</option>
+                                        <option value="date">' . get_string('type_date', 'mod_cv') . '</option>
+                                        <option value="number">' . get_string('type_number', 'mod_cv') . '</option>
+                                        <option value="checkbox">' . get_string('type_checkbox', 'mod_cv') . '</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="modal_field_section" class="form-label font-weight-bold">' . get_string('field_section', 'mod_cv') . '</label>
+                                    <select class="form-select custom-select" id="modal_field_section">
+                                        <option value="basic">' . get_string('section_basic', 'mod_cv') . '</option>
+                                        <option value="timeline">' . get_string('section_timeline', 'mod_cv') . '</option>
+                                        <option value="deliverables">' . get_string('section_deliverables', 'mod_cv') . '</option>
+                                        <option value="governance">' . get_string('section_governance', 'mod_cv') . '</option>
+                                        <option value="custom">' . get_string('section_custom', 'mod_cv') . '</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3" id="modal_field_options_group" style="display: none;">
+                                <label for="modal_field_options" class="form-label font-weight-bold">' . get_string('field_options', 'mod_cv') . '</label>
+                                <textarea class="form-control" id="modal_field_options" rows="3" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                                <small class="form-text text-muted">' . get_string('field_options_help', 'mod_cv') . '</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_field_placeholder" class="form-label font-weight-bold">' . get_string('field_placeholder', 'mod_cv') . '</label>
+                                <input type="text" class="form-control" id="modal_field_placeholder" placeholder="e.g. Ex.: $100,000">
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_field_helptext" class="form-label font-weight-bold">' . get_string('field_helptext', 'mod_cv') . '</label>
+                                <input type="text" class="form-control" id="modal_field_helptext" placeholder="Short description shown below the input">
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="modal_field_required">
+                                <label class="form-check-label" for="modal_field_required">' . get_string('field_required', 'mod_cv') . '</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modal_field_enabled" checked>
+                                <label class="form-check-label" for="modal_field_enabled">' . get_string('status_active', 'mod_cv') . '</label>
+                            </div>
+                            <div class="alert alert-danger d-none mt-3 mb-0" id="modal_field_error"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">' . get_string('cancel') . '</button>
+                            <button type="button" class="btn btn-primary" id="btn_save_modal_field">' . get_string('save_field', 'mod_cv') . '</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+        $mform->addElement('html', $fieldmanagerhtml);
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 
@@ -167,5 +286,46 @@ class mod_cv_mod_form extends moodleform_mod {
             (int) $defaultvalues['showsummary'] : 1;
         $defaultvalues['maxattempts'] = isset($defaultvalues['maxattempts']) ?
             (int) $defaultvalues['maxattempts'] : 0;
+
+        $rawfields = $defaultvalues['projectfields'] ?? null;
+        if (!empty($rawfields) && is_string($rawfields)) {
+            $decoded = json_decode($rawfields, true);
+            if (is_array($decoded)) {
+                $fields = \mod_cv\fields_manager::sanitize_fields($decoded);
+            } else {
+                $fields = \mod_cv\fields_manager::get_default_fields();
+            }
+        } else {
+            $fields = \mod_cv\fields_manager::get_default_fields();
+        }
+
+        $fieldsjson = json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $defaultvalues['projectfields'] = $fieldsjson;
+
+        // Initialize AMD Javascript for the form fields manager.
+        global $PAGE;
+        $sections = \mod_cv\fields_manager::get_sections();
+        $types = \mod_cv\fields_manager::get_types();
+        $PAGE->requires->js_call_amd('mod_cv/form_fields', 'init', [$fields, $sections, $types]);
+    }
+
+    /**
+     * Ensure form fields and AMD module are initialized for new activity creation.
+     */
+    public function definition_after_data() {
+        parent::definition_after_data();
+
+        $mform = $this->_form;
+        $val = $mform->getElementValue('projectfields');
+        if (empty($val)) {
+            $defaultfields = \mod_cv\fields_manager::get_default_fields();
+            $fieldsjson = json_encode($defaultfields, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $mform->setDefault('projectfields', $fieldsjson);
+
+            global $PAGE;
+            $sections = \mod_cv\fields_manager::get_sections();
+            $types = \mod_cv\fields_manager::get_types();
+            $PAGE->requires->js_call_amd('mod_cv/form_fields', 'init', [$defaultfields, $sections, $types]);
+        }
     }
 }
