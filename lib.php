@@ -59,6 +59,18 @@ function cv_process_instance_data(stdClass $cv): void {
     } else {
         $cv->showcourseeducation = (int) $cv->showcourseeducation;
     }
+
+    if (!isset($cv->showreview)) {
+        $cv->showreview = 1;
+    } else {
+        $cv->showreview = (int) $cv->showreview;
+    }
+
+    if (!isset($cv->showsummary)) {
+        $cv->showsummary = 1;
+    } else {
+        $cv->showsummary = (int) $cv->showsummary;
+    }
 }
 
 /**
@@ -132,6 +144,8 @@ function cv_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return defined('MOD_PURPOSE_ASSESSMENT') ? MOD_PURPOSE_ASSESSMENT : 'assessment';
         default:
             return null;
     }

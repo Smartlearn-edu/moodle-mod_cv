@@ -150,6 +150,8 @@ $ispending = ($status === 'pending');
 
 $showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
 $showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+$showreview = !isset($cv->showreview) || !empty($cv->showreview);
+$showsummary = !isset($cv->showsummary) || !empty($cv->showsummary);
 
 $stepnum = 1;
 $personaltitle = '';
@@ -181,6 +183,8 @@ $templatedata = [
     'provider_name' => !empty($cv->providername) ? $cv->providername : 'SmartLearn Education',
     'show_candidate_info' => $showcandidateinfo,
     'show_course_education' => $showcourseeducation,
+    'show_review' => $showreview,
+    'show_summary' => $showsummary,
     'personal_title' => $personaltitle,
     'course_title' => $coursetitle,
     'projects_title' => $projectstitle,
@@ -198,6 +202,8 @@ $templatedata = [
         'status' => $status,
         'show_candidate_info' => $showcandidateinfo,
         'show_course_education' => $showcourseeducation,
+        'show_review' => $showreview,
+        'show_summary' => $showsummary,
         'default_candidate' => [
             'name' => fullname($USER),
             'email' => $USER->email,

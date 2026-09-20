@@ -115,6 +115,16 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setType('showcourseeducation', PARAM_INT);
         $mform->addHelpButton('showcourseeducation', 'show_course_education', 'mod_cv');
 
+        $mform->addElement('selectyesno', 'showreview', get_string('show_review', 'mod_cv'));
+        $mform->setDefault('showreview', 1);
+        $mform->setType('showreview', PARAM_INT);
+        $mform->addHelpButton('showreview', 'show_review', 'mod_cv');
+
+        $mform->addElement('selectyesno', 'showsummary', get_string('show_summary', 'mod_cv'));
+        $mform->setDefault('showsummary', 1);
+        $mform->setType('showsummary', PARAM_INT);
+        $mform->addHelpButton('showsummary', 'show_summary', 'mod_cv');
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 
@@ -139,5 +149,9 @@ class mod_cv_mod_form extends moodleform_mod {
             (int) $defaultvalues['showcandidateinfo'] : 1;
         $defaultvalues['showcourseeducation'] = isset($defaultvalues['showcourseeducation']) ?
             (int) $defaultvalues['showcourseeducation'] : 1;
+        $defaultvalues['showreview'] = isset($defaultvalues['showreview']) ?
+            (int) $defaultvalues['showreview'] : 1;
+        $defaultvalues['showsummary'] = isset($defaultvalues['showsummary']) ?
+            (int) $defaultvalues['showsummary'] : 1;
     }
 }

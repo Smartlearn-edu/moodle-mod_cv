@@ -24,8 +24,7 @@
     <!-- Header / Banner -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-            <h2 class="mb-1">{{activityname}}</h2>
-            <p class="text-muted mb-0">{{#str}}header_subtitle, mod_cv{{/str}}</p>
+            <h2 class="mb-0">{{activityname}}</h2>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
             {{#domain_title}}
@@ -186,13 +185,21 @@
                 <div id="cv_info_alert" class="alert alert-info d-none text-left" role="alert"></div>
                 <div id="cv_error_alert" class="alert alert-danger d-none text-left" role="alert"></div>
 
-                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" id="btn_submit_ai">
-                    <i class="fa fa-magic"></i> {{#str}}btn_generate_ai, mod_cv{{/str}}
-                </button>
+                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm" id="btn_submit_ai">
+                        <i class="fa fa-magic"></i> {{#str}}btn_generate_ai, mod_cv{{/str}}
+                    </button>
+                    {{^show_review}}
+                    <a href="{{export_url}}" class="btn btn-success btn-lg px-4 shadow-sm {{^has_output}}d-none{{/has_output}}" id="btn_download_direct" target="_blank">
+                        <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
+                    </a>
+                    {{/show_review}}
+                </div>
             </div>
         </div>
     </form>
 
+    {{#show_review}}
     <!-- Card 5: Review & Download Section -->
     <div id="cv_review_section" class="cv-card {{^has_output}}d-none{{/has_output}}">
         <div class="cv-card-header">
@@ -207,6 +214,7 @@
             </div>
         </div>
     </div>
+    {{/show_review}}
 
 </div>
 

@@ -24,6 +24,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
     'use strict';
 
     var projectCounter = 0;
+    var initialConfig = {};
 
     /**
      * Escape HTML helper.
@@ -212,15 +213,37 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
      * @param {Object} data
      */
     function renderAiOutput(data) {
+        var showReview = (initialConfig.show_review !== false);
+        var showSummary = (initialConfig.show_summary !== false);
+
+        var directDownloadBtn = document.getElementById('btn_download_direct');
+        if (directDownloadBtn) {
+            directDownloadBtn.classList.remove('d-none');
+        }
+
         var container = document.getElementById('cv_output_display');
+        var reviewSection = document.getElementById('cv_review_section');
+
+        if (!showReview) {
+            if (reviewSection) {
+                reviewSection.classList.add('d-none');
+            }
+            var infoAlert = document.getElementById('cv_info_alert');
+            if (infoAlert) {
+                infoAlert.innerHTML = '<i class="fa fa-check-circle text-success"></i> Application generated successfully! You can download your official PDF dossier now.';
+                infoAlert.classList.remove('d-none');
+            }
+            return;
+        }
+
         if (!container) {
             return;
         }
 
         var html = '';
 
-        // Executive Summary if present.
-        if (data.summary) {
+        // Executive Summary if present and enabled.
+        if (showSummary && data.summary) {
             html += '<div class="cv-output-box">' +
                 '<div class="cv-output-header">' +
                 '   <h5 class="mb-0 font-weight-bold text-primary"><i class="fa fa-id-badge"></i> Professional Summary</h5>' +
@@ -258,7 +281,6 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
 
         container.innerHTML = html;
-        var reviewSection = document.getElementById('cv_review_section');
         if (reviewSection) {
             reviewSection.classList.remove('d-none');
             reviewSection.scrollIntoView({ behavior: 'smooth' });
@@ -355,6 +377,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     initialData = {};
                 }
             }
+            initialConfig = initialData;
 
             // Populate existing saved projects or add default empty project.
             if (initialData.saved_projects && initialData.saved_projects.length > 0) {

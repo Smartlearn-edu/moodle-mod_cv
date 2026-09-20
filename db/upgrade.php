@@ -118,5 +118,42 @@ function xmldb_cv_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026092000, 'cv');
     }
 
+    if ($oldversion < 2026092001) {
+        $table = new xmldb_table('cv');
+
+        // Define field showreview to be added to cv table.
+        $showreview = new xmldb_field(
+            'showreview',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '1',
+            'showcourseeducation'
+        );
+        if (!$dbman->field_exists($table, $showreview)) {
+            $dbman->add_field($table, $showreview);
+        }
+
+        // Define field showsummary to be added to cv table.
+        $showsummary = new xmldb_field(
+            'showsummary',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '1',
+            'showreview'
+        );
+        if (!$dbman->field_exists($table, $showsummary)) {
+            $dbman->add_field($table, $showsummary);
+        }
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026092001, 'cv');
+    }
+
     return true;
 }

@@ -88,6 +88,7 @@ $html .= '<p style="color: #64748b; font-size: 9pt;">Official Professional Dossi
 
 $showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
 $showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+$showsummary = !isset($cv->showsummary) || !empty($cv->showsummary);
 
 $sectionnum = 1;
 
@@ -152,8 +153,8 @@ if ($showcourseeducation) {
     $html .= '</table>';
 }
 
-// Executive Summary if present.
-if (!empty($aioutput['summary'])) {
+// Executive Summary if present and enabled.
+if (!empty($aioutput['summary']) && $showsummary) {
     $html .= '<h2>' . ($sectionnum++) . '. Professional Summary</h2>';
     $html .= '<div class="box"><p>' . nl2br(htmlspecialchars($aioutput['summary'])) . '</p></div>';
 }
