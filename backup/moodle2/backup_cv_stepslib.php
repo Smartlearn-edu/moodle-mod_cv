@@ -23,13 +23,10 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Define the complete CV structure for backup, with file and id annotations.
  */
 class backup_cv_activity_structure_step extends backup_activity_structure_step {
-
     /**
      * Define the structure of the CV backup.
      *

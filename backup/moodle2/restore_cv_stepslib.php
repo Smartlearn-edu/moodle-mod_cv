@@ -23,13 +23,10 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Structure step to restore one CV activity.
  */
 class restore_cv_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define the structure of the restore workflow.
      *
