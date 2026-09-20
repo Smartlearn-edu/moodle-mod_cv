@@ -86,71 +86,80 @@ $html = '<style>
 $html .= '<h1>Application & Project Experience Dossier</h1>';
 $html .= '<p style="color: #64748b; font-size: 9pt;">Official Professional Dossier for ' . htmlspecialchars($examtitle) . ' &bull; ' . htmlspecialchars($domaintitle) . '</p>';
 
+$showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
+$showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+
+$sectionnum = 1;
+
 // Candidate Section.
-$html .= '<h2>1. Candidate Profile</h2>';
-$html .= '<table class="table-info">';
-$html .= '<tr><td class="label">Full Name:</td><td>' . htmlspecialchars($profile['name']) . '</td></tr>';
-$html .= '<tr><td class="label">Email Address:</td><td>' . htmlspecialchars($profile['email']) . '</td></tr>';
-if (!empty($profile['phone'])) {
-    $html .= '<tr><td class="label">Phone Number:</td><td>' . htmlspecialchars($profile['phone']) . '</td></tr>';
-}
-if (!empty($profile['country'])) {
-    $html .= '<tr><td class="label">Country:</td><td>' . htmlspecialchars($profile['country']) . '</td></tr>';
-}
-$html .= '<tr><td class="label">Highest Education Level:</td><td>' . htmlspecialchars(ucfirst($profile['degree'] ?? 'bachelors')) . '</td></tr>';
-if (!empty($profile['institution'])) {
-    $html .= '<tr><td class="label">Institution / University:</td><td>' . htmlspecialchars($profile['institution']) . '</td></tr>';
-}
-if (!empty($profile['degree_startdate']) || !empty($profile['degree_enddate'])) {
-    $degstart = $profile['degree_startdate'] ?? '';
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degstart, $m)) {
-        $degstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+if ($showcandidateinfo) {
+    $html .= '<h2>' . ($sectionnum++) . '. Candidate Profile</h2>';
+    $html .= '<table class="table-info">';
+    $html .= '<tr><td class="label">Full Name:</td><td>' . htmlspecialchars($profile['name']) . '</td></tr>';
+    $html .= '<tr><td class="label">Email Address:</td><td>' . htmlspecialchars($profile['email']) . '</td></tr>';
+    if (!empty($profile['phone'])) {
+        $html .= '<tr><td class="label">Phone Number:</td><td>' . htmlspecialchars($profile['phone']) . '</td></tr>';
     }
-    $degend = $profile['degree_enddate'] ?? '';
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degend, $m)) {
-        $degend = $m[3] . '/' . $m[2] . '/' . $m[1];
+    if (!empty($profile['country'])) {
+        $html .= '<tr><td class="label">Country:</td><td>' . htmlspecialchars($profile['country']) . '</td></tr>';
     }
-    $degdates = trim($degstart . ($degend ? ' to ' . $degend : ''));
-    if (!empty($degdates)) {
-        $html .= '<tr><td class="label">Degree Dates / Graduation:</td><td>' . htmlspecialchars($degdates) . '</td></tr>';
+    $html .= '<tr><td class="label">Highest Education Level:</td><td>' . htmlspecialchars(ucfirst($profile['degree'] ?? 'bachelors')) . '</td></tr>';
+    if (!empty($profile['institution'])) {
+        $html .= '<tr><td class="label">Institution / University:</td><td>' . htmlspecialchars($profile['institution']) . '</td></tr>';
     }
+    if (!empty($profile['degree_startdate']) || !empty($profile['degree_enddate'])) {
+        $degstart = $profile['degree_startdate'] ?? '';
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degstart, $m)) {
+            $degstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+        }
+        $degend = $profile['degree_enddate'] ?? '';
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $degend, $m)) {
+            $degend = $m[3] . '/' . $m[2] . '/' . $m[1];
+        }
+        $degdates = trim($degstart . ($degend ? ' to ' . $degend : ''));
+        if (!empty($degdates)) {
+            $html .= '<tr><td class="label">Degree Dates / Graduation:</td><td>' . htmlspecialchars($degdates) . '</td></tr>';
+        }
+    }
+    $html .= '</table>';
 }
-$html .= '</table>';
 
 // Education Section.
-$savedcourse = $rawinput['course'] ?? [];
-$coursename = !empty($savedcourse['name']) ? $savedcourse['name'] : $course->fullname;
-$html .= '<h2>2. Qualifying Course & Professional Education</h2>';
-$html .= '<table class="table-info">';
-$html .= '<tr><td class="label">Course Title:</td><td>' . htmlspecialchars($coursename) . '</td></tr>';
-if (!empty($savedcourse['startdate']) || !empty($savedcourse['enddate'])) {
-    $cstart = $savedcourse['startdate'] ?? '';
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cstart, $m)) {
-        $cstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+if ($showcourseeducation) {
+    $savedcourse = $rawinput['course'] ?? [];
+    $coursename = !empty($savedcourse['name']) ? $savedcourse['name'] : $course->fullname;
+    $html .= '<h2>' . ($sectionnum++) . '. Qualifying Course & Professional Education</h2>';
+    $html .= '<table class="table-info">';
+    $html .= '<tr><td class="label">Course Title:</td><td>' . htmlspecialchars($coursename) . '</td></tr>';
+    if (!empty($savedcourse['startdate']) || !empty($savedcourse['enddate'])) {
+        $cstart = $savedcourse['startdate'] ?? '';
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cstart, $m)) {
+            $cstart = $m[3] . '/' . $m[2] . '/' . $m[1];
+        }
+        $cend = $savedcourse['enddate'] ?? '';
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cend, $m)) {
+            $cend = $m[3] . '/' . $m[2] . '/' . $m[1];
+        }
+        $cdates = trim($cstart . ($cend ? ' to ' . $cend : ''));
+        if (!empty($cdates)) {
+            $html .= '<tr><td class="label">Course Dates:</td><td>' . htmlspecialchars($cdates) . '</td></tr>';
+        }
     }
-    $cend = $savedcourse['enddate'] ?? '';
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $cend, $m)) {
-        $cend = $m[3] . '/' . $m[2] . '/' . $m[1];
-    }
-    $cdates = trim($cstart . ($cend ? ' to ' . $cend : ''));
-    if (!empty($cdates)) {
-        $html .= '<tr><td class="label">Course Dates:</td><td>' . htmlspecialchars($cdates) . '</td></tr>';
-    }
+    $html .= '<tr><td class="label">Professional Track:</td><td>' . htmlspecialchars($domaintitle) . '</td></tr>';
+    $html .= '<tr><td class="label">Target Certification:</td><td>' . htmlspecialchars($examtitle) . '</td></tr>';
+    $html .= '<tr><td class="label">Qualifying Contact Hours:</td><td>' . htmlspecialchars($cv->contacthours) . ' Hours</td></tr>';
+    $html .= '<tr><td class="label">Education Provider:</td><td>' . htmlspecialchars($providername) . '</td></tr>';
+    $html .= '</table>';
 }
-$html .= '<tr><td class="label">Professional Track:</td><td>' . htmlspecialchars($domaintitle) . '</td></tr>';
-$html .= '<tr><td class="label">Target Certification:</td><td>' . htmlspecialchars($examtitle) . '</td></tr>';
-$html .= '<tr><td class="label">Qualifying Contact Hours:</td><td>' . htmlspecialchars($cv->contacthours) . ' Hours</td></tr>';
-$html .= '<tr><td class="label">Education Provider:</td><td>' . htmlspecialchars($providername) . '</td></tr>';
-$html .= '</table>';
 
 // Executive Summary if present.
 if (!empty($aioutput['summary'])) {
-    $html .= '<h2>3. Professional Summary</h2>';
+    $html .= '<h2>' . ($sectionnum++) . '. Professional Summary</h2>';
     $html .= '<div class="box"><p>' . nl2br(htmlspecialchars($aioutput['summary'])) . '</p></div>';
 }
 
 // Project Experience.
-$html .= '<h2>4. Project Experience Write-Ups</h2>';
+$html .= '<h2>' . ($sectionnum++) . '. Project Experience Write-Ups</h2>';
 $savedprojects = $rawinput['projects'] ?? [];
 
 if (!empty($aioutput['projects']) && is_array($aioutput['projects'])) {

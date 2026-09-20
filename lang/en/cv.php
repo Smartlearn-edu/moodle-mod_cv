@@ -43,6 +43,15 @@ $string['default_auth_token_desc'] = 'Optional Bearer token or secret to pass in
 
 // Activity settings form.
 $string['activity_settings'] = 'Certification & Track Configuration';
+$string['display_settings'] = 'Section Display Options';
+$string['display_settings_help'] = 'Choose which sections are displayed to candidates in this activity.';
+$string['show_candidate_info'] = 'Show Candidate Information';
+$string['show_candidate_info_help'] = 'When enabled, students will see and complete the Candidate Information section (academic degree, university, graduation dates, and personal contact details).';
+$string['show_course_education'] = 'Show Qualifying Course Education';
+$string['show_course_education_help'] = 'When enabled, students will see the Qualifying Course Education section (course selector, course dates, contact hours, and education provider).';
+$string['step_personal_title_content'] = 'Candidate Information';
+$string['step_course_title_content'] = 'Qualifying Course Education';
+$string['step_projects_title_content'] = 'Project Experience Entries';
 $string['field_type'] = 'Professional Track / Domain';
 $string['field_type_help'] = 'Select the professional field or industry track this activity is tailored for. Each domain provides tailored certification options and specialized pre-made AI prompts.';
 $string['field_pmi'] = 'Project Management (PMI®)';

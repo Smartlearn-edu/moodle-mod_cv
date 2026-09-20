@@ -148,6 +148,24 @@ $examtitle = \mod_cv\domains::get_cert_title($fieldtype, $cv->examtype, $customc
 $status = $submission ? $submission->status : 'draft';
 $ispending = ($status === 'pending');
 
+$showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
+$showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+
+$stepnum = 1;
+$personaltitle = '';
+if ($showcandidateinfo) {
+    $personaltitle = $stepnum . '. ' . get_string('step_personal_title_content', 'mod_cv');
+    $stepnum++;
+}
+
+$coursetitle = '';
+if ($showcourseeducation) {
+    $coursetitle = $stepnum . '. ' . get_string('step_course_title_content', 'mod_cv');
+    $stepnum++;
+}
+
+$projectstitle = $stepnum . '. ' . get_string('step_projects_title_content', 'mod_cv');
+
 $templatedata = [
     'cmid' => $cm->id,
     'activityname' => format_string($cv->name),
@@ -161,6 +179,11 @@ $templatedata = [
     'exam_title' => $examtitle,
     'contact_hours' => $cv->contacthours,
     'provider_name' => !empty($cv->providername) ? $cv->providername : 'SmartLearn Education',
+    'show_candidate_info' => $showcandidateinfo,
+    'show_course_education' => $showcourseeducation,
+    'personal_title' => $personaltitle,
+    'course_title' => $coursetitle,
+    'projects_title' => $projectstitle,
     'candidate' => $profile,
     'degree_is_bachelors' => ($degree === 'bachelors'),
     'degree_is_secondary' => ($degree === 'secondary'),
@@ -173,6 +196,12 @@ $templatedata = [
         'saved_course' => $savedcourse,
         'ai_output' => $aioutput,
         'status' => $status,
+        'show_candidate_info' => $showcandidateinfo,
+        'show_course_education' => $showcourseeducation,
+        'default_candidate' => [
+            'name' => fullname($USER),
+            'email' => $USER->email,
+        ],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 ];
 

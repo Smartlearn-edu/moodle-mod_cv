@@ -47,6 +47,18 @@ function cv_process_instance_data(stdClass $cv): void {
     if (!isset($cv->aiprovider)) {
         $cv->aiprovider = \mod_cv\ai_processor::PROVIDER_DEFAULT;
     }
+
+    if (!isset($cv->showcandidateinfo)) {
+        $cv->showcandidateinfo = 1;
+    } else {
+        $cv->showcandidateinfo = (int) $cv->showcandidateinfo;
+    }
+
+    if (!isset($cv->showcourseeducation)) {
+        $cv->showcourseeducation = 1;
+    } else {
+        $cv->showcourseeducation = (int) $cv->showcourseeducation;
+    }
 }
 
 /**

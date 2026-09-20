@@ -102,6 +102,19 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setType('customprompt', PARAM_RAW);
         $mform->addHelpButton('customprompt', 'custom_prompt', 'mod_cv');
 
+        // Section display options.
+        $mform->addElement('header', 'displayoptions', get_string('display_settings', 'mod_cv'));
+
+        $mform->addElement('selectyesno', 'showcandidateinfo', get_string('show_candidate_info', 'mod_cv'));
+        $mform->setDefault('showcandidateinfo', 1);
+        $mform->setType('showcandidateinfo', PARAM_INT);
+        $mform->addHelpButton('showcandidateinfo', 'show_candidate_info', 'mod_cv');
+
+        $mform->addElement('selectyesno', 'showcourseeducation', get_string('show_course_education', 'mod_cv'));
+        $mform->setDefault('showcourseeducation', 1);
+        $mform->setType('showcourseeducation', PARAM_INT);
+        $mform->addHelpButton('showcourseeducation', 'show_course_education', 'mod_cv');
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 
@@ -122,5 +135,9 @@ class mod_cv_mod_form extends moodleform_mod {
         $defaultvalues['fieldtype'] = $fieldtype;
         $defaultvalues['examtype_' . $fieldtype] = $examtype;
         $defaultvalues['aiprovider'] = $defaultvalues['aiprovider'] ?? \mod_cv\ai_processor::PROVIDER_DEFAULT;
+        $defaultvalues['showcandidateinfo'] = isset($defaultvalues['showcandidateinfo']) ?
+            (int) $defaultvalues['showcandidateinfo'] : 1;
+        $defaultvalues['showcourseeducation'] = isset($defaultvalues['showcourseeducation']) ?
+            (int) $defaultvalues['showcourseeducation'] : 1;
     }
 }

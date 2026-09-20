@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_cv';
-$plugin->version = 2026091005;
+$plugin->version = 2026092000;
 $plugin->requires = 2022112800; // Requires Moodle 4.1 or higher.
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v0.4.0';
+$plugin->release = 'v0.5.0';

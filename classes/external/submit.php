@@ -41,8 +41,8 @@ class submit extends external_api {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'Course module ID'),
             'profile' => new external_single_structure([
-                'name' => new external_value(PARAM_TEXT, 'Candidate full name'),
-                'email' => new external_value(PARAM_EMAIL, 'Candidate email'),
+                'name' => new external_value(PARAM_TEXT, 'Candidate full name', VALUE_DEFAULT, ''),
+                'email' => new external_value(PARAM_RAW, 'Candidate email', VALUE_DEFAULT, ''),
                 'phone' => new external_value(PARAM_TEXT, 'Candidate phone', VALUE_DEFAULT, ''),
                 'country' => new external_value(PARAM_TEXT, 'Candidate country', VALUE_DEFAULT, ''),
                 'degree' => new external_value(PARAM_ALPHAEXT, 'Education degree level', VALUE_DEFAULT, 'bachelors'),
@@ -123,6 +123,20 @@ class submit extends external_api {
 
         $now = time();
 
+        $profile = $params['profile'];
+        if (empty($profile['name'])) {
+            $profile['name'] = fullname($USER);
+        }
+        if (empty($profile['email'])) {
+            $profile['email'] = $USER->email;
+        } else {
+            $profile['email'] = clean_param($profile['email'], PARAM_EMAIL);
+        }
+        $params['profile'] = $profile;
+
+        $showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
+        $showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+
         $coursedata = !empty($params['course_info']['name']) ? $params['course_info'] : [
             'id' => (int) $course->id,
             'name' => $course->fullname,
@@ -131,9 +145,11 @@ class submit extends external_api {
         ];
 
         $rawjson = json_encode([
-            'profile' => $params['profile'],
+            'profile' => $profile,
             'course' => $coursedata,
             'projects' => $params['projects'],
+            'show_candidate_info' => $showcandidateinfo,
+            'show_course_education' => $showcourseeducation,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
@@ -199,6 +215,8 @@ class submit extends external_api {
                 'startdate' => $coursedata['startdate'] ?? '',
                 'enddate' => $coursedata['enddate'] ?? '',
             ],
+            'show_candidate_info' => $showcandidateinfo,
+            'show_course_education' => $showcourseeducation,
             'candidate' => $params['profile'],
             'projects' => $params['projects'],
         ];

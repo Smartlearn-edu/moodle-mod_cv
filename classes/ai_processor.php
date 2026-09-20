@@ -163,6 +163,9 @@ class ai_processor {
         $system .= "  ]\n";
         $system .= "}\n";
 
+        $showcandidateinfo = !isset($cv->showcandidateinfo) || !empty($cv->showcandidateinfo);
+        $showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcourseeducation);
+
         // Construct structured user prompt.
         $user = "Target Track & Certification:\n";
         $user .= "- Domain Track: {$domaintitle}\n";
@@ -170,19 +173,26 @@ class ai_processor {
         $user .= "- Qualifying Contact Hours: {$contacthours}\n";
         $user .= "- Training Provider: {$providername}\n\n";
 
-        $user .= "Qualifying Course Information:\n";
-        $user .= "- Course Name: " . ($coursedata['name'] ?? '') . "\n";
-        $user .= "- Course Start Date: " . ($coursedata['startdate'] ?? 'N/A') . "\n";
-        $user .= "- Course Completion Date: " . ($coursedata['enddate'] ?? 'N/A') . "\n\n";
+        if ($showcourseeducation) {
+            $user .= "Qualifying Course Information:\n";
+            $user .= "- Course Name: " . ($coursedata['name'] ?? '') . "\n";
+            $user .= "- Course Start Date: " . ($coursedata['startdate'] ?? 'N/A') . "\n";
+            $user .= "- Course Completion Date: " . ($coursedata['enddate'] ?? 'N/A') . "\n\n";
+        }
 
-        $user .= "Candidate Profile:\n";
-        $user .= "- Name: " . ($profile['name'] ?? '') . "\n";
-        $user .= "- Email: " . ($profile['email'] ?? '') . "\n";
-        $user .= "- Phone: " . ($profile['phone'] ?? 'N/A') . "\n";
-        $user .= "- Country: " . ($profile['country'] ?? 'N/A') . "\n";
-        $user .= "- Highest Academic Degree: " . ($profile['degree'] ?? '') . "\n";
-        $user .= "- Institution: " . ($profile['institution'] ?? '') . "\n";
-        $user .= "- Degree Dates: " . ($profile['degree_startdate'] ?? '') . " to " . ($profile['degree_enddate'] ?? '') . "\n\n";
+        if ($showcandidateinfo) {
+            $user .= "Candidate Profile:\n";
+            $user .= "- Name: " . ($profile['name'] ?? '') . "\n";
+            $user .= "- Email: " . ($profile['email'] ?? '') . "\n";
+            $user .= "- Phone: " . ($profile['phone'] ?? 'N/A') . "\n";
+            $user .= "- Country: " . ($profile['country'] ?? 'N/A') . "\n";
+            $user .= "- Highest Academic Degree: " . ($profile['degree'] ?? '') . "\n";
+            $user .= "- Institution: " . ($profile['institution'] ?? '') . "\n";
+            $user .= "- Degree Dates: " . ($profile['degree_startdate'] ?? '') . " to " . ($profile['degree_enddate'] ?? '') . "\n\n";
+        } else if (!empty($profile['name'])) {
+            $user .= "Candidate Profile:\n";
+            $user .= "- Name: " . $profile['name'] . "\n\n";
+        }
 
         $user .= "Candidate Project Experiences (" . count($projects) . " projects):\n";
         foreach ($projects as $index => $proj) {

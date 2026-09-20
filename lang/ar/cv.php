@@ -45,6 +45,15 @@ $string['default_prompt_desc'] = 'التعليمات الافتراضية للذ
 
 // Activity settings form.
 $string['activity_settings'] = 'إعدادات المسار المهني والشهادة';
+$string['display_settings'] = 'خيارات عرض الأقسام';
+$string['display_settings_help'] = 'تحديد الأقسام التي تظهر للطلاب في هذا النشاط.';
+$string['show_candidate_info'] = 'عرض قسم معلومات المرشح';
+$string['show_candidate_info_help'] = 'في حال التفعيل، سيظهر قسم معلومات المرشح (المؤهل الأكاديمي، الجامعة، تواريخ التخرج وبيانات التواصل) للطالب.';
+$string['show_course_education'] = 'عرض قسم بيانات التعليم والدورة المؤهلة';
+$string['show_course_education_help'] = 'في حال التفعيل، سيظهر قسم الدورة التدريبية المؤهلة (اختيار الدورة وتواريخها وساعات الاتصال والجهة المزودة) للطالب.';
+$string['step_personal_title_content'] = 'معلومات المرشح (Candidate Information)';
+$string['step_course_title_content'] = 'بيانات التعليم والدورة المؤهلة (Qualifying Course Education)';
+$string['step_projects_title_content'] = 'إدخال خبرات المشاريع (Project Experience Entries)';
 $string['field_type'] = 'المجال / المسار المهني';
 $string['field_type_help'] = 'اختر المجال أو القطاع المهني الذي يتبعه هذا النشاط. يوفر كل مجال خيارات شهادات مخصصة وبرومبت ذكاء اصطناعي متخصص مدمج تلقائياً.';
 $string['field_pmi'] = 'إدارة المشاريع (PMI®)';

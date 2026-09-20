@@ -475,61 +475,92 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     errorAlert.classList.add('d-none');
                     errorAlert.textContent = '';
 
-                    // Collect candidate profile.
-                    var instEl = document.getElementById('degree_institution');
-                    var degreeStartEl = document.getElementById('degree_startdate');
-                    var degreeEndEl = document.getElementById('degree_enddate');
+                    // Collect candidate profile if section is visible.
+                    var candNameEl = document.getElementById('candidate_name');
+                    var profile = {};
 
-                    var profile = {
-                        name: document.getElementById('candidate_name').value.trim(),
-                        email: document.getElementById('candidate_email').value.trim(),
-                        phone: document.getElementById('candidate_phone').value.trim(),
-                        country: document.getElementById('candidate_country').value.trim(),
-                        degree: document.getElementById('degree_level').value,
-                        institution: instEl ? instEl.value.trim() : '',
-                        degree_startdate: degreeStartEl ? degreeStartEl.value.trim() : '',
-                        degree_enddate: degreeEndEl ? degreeEndEl.value.trim() : ''
-                    };
+                    if (candNameEl) {
+                        var instEl = document.getElementById('degree_institution');
+                        var degreeStartEl = document.getElementById('degree_startdate');
+                        var degreeEndEl = document.getElementById('degree_enddate');
+                        var phoneEl = document.getElementById('candidate_phone');
+                        var countryEl = document.getElementById('candidate_country');
+                        var degreeLevelEl = document.getElementById('degree_level');
+                        var candEmailEl = document.getElementById('candidate_email');
 
-                    if (!profile.name || !profile.email || !profile.institution ||
-                        !profile.degree_startdate || !profile.degree_enddate) {
-                        errorAlert.textContent = 'Please complete all required fields (*) in Candidate Information.';
-                        errorAlert.classList.remove('d-none');
-                        if (instEl) {
-                            instEl.scrollIntoView({ behavior: 'smooth' });
+                        profile = {
+                            name: candNameEl.value.trim(),
+                            email: candEmailEl ? candEmailEl.value.trim() : '',
+                            phone: phoneEl ? phoneEl.value.trim() : '',
+                            country: countryEl ? countryEl.value.trim() : '',
+                            degree: degreeLevelEl ? degreeLevelEl.value : 'bachelors',
+                            institution: instEl ? instEl.value.trim() : '',
+                            degree_startdate: degreeStartEl ? degreeStartEl.value.trim() : '',
+                            degree_enddate: degreeEndEl ? degreeEndEl.value.trim() : ''
+                        };
+
+                        if (!profile.name || !profile.email || !profile.institution ||
+                            !profile.degree_startdate || !profile.degree_enddate) {
+                            errorAlert.textContent = 'Please complete all required fields (*) in Candidate Information.';
+                            errorAlert.classList.remove('d-none');
+                            if (instEl) {
+                                instEl.scrollIntoView({ behavior: 'smooth' });
+                            }
+                            return;
                         }
-                        return;
+                    } else {
+                        // Section is hidden, use defaults.
+                        var defaultCand = initialData.default_candidate || {};
+                        profile = {
+                            name: defaultCand.name || '',
+                            email: defaultCand.email || '',
+                            phone: '',
+                            country: '',
+                            degree: 'bachelors',
+                            institution: '',
+                            degree_startdate: '',
+                            degree_enddate: ''
+                        };
                     }
 
-                    // Collect course info.
+                    // Collect course info if section is visible.
                     var cSelector = document.getElementById('course_selector');
                     var courseStartEl = document.getElementById('course_startdate');
                     var courseEndEl = document.getElementById('course_enddate');
+                    var courseInfo = {};
 
-                    var courseId = cSelector ? parseInt(cSelector.value, 10) || 0 : 0;
-                    var courseName = '';
-                    if (cSelector && cSelector.selectedIndex >= 0) {
-                        var opt = cSelector.options[cSelector.selectedIndex];
-                        courseName = opt.getAttribute('data-fullname') || opt.text || '';
-                    }
-                    var courseStartDate = courseStartEl ? courseStartEl.value.trim() : '';
-                    var courseEndDate = courseEndEl ? courseEndEl.value.trim() : '';
-
-                    if (!courseStartDate || !courseEndDate) {
-                        errorAlert.textContent = 'Please provide both start and end dates for the course.';
-                        errorAlert.classList.remove('d-none');
-                        if (courseStartEl) {
-                            courseStartEl.scrollIntoView({ behavior: 'smooth' });
+                    if (courseStartEl && courseEndEl) {
+                        var courseId = cSelector ? parseInt(cSelector.value, 10) || 0 : 0;
+                        var courseName = '';
+                        if (cSelector && cSelector.selectedIndex >= 0) {
+                            var opt = cSelector.options[cSelector.selectedIndex];
+                            courseName = opt.getAttribute('data-fullname') || opt.text || '';
                         }
-                        return;
-                    }
+                        var courseStartDate = courseStartEl.value.trim();
+                        var courseEndDate = courseEndEl.value.trim();
 
-                    var courseInfo = {
-                        id: courseId,
-                        name: courseName,
-                        startdate: courseStartDate,
-                        enddate: courseEndDate
-                    };
+                        if (!courseStartDate || !courseEndDate) {
+                            errorAlert.textContent = 'Please provide both start and end dates for the course.';
+                            errorAlert.classList.remove('d-none');
+                            courseStartEl.scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+
+                        courseInfo = {
+                            id: courseId,
+                            name: courseName,
+                            startdate: courseStartDate,
+                            enddate: courseEndDate
+                        };
+                    } else {
+                        // Section is hidden, pass default course data.
+                        courseInfo = {
+                            id: 0,
+                            name: '',
+                            startdate: '',
+                            enddate: ''
+                        };
+                    }
 
                     // Collect project cards.
                     var projectCards = document.querySelectorAll('.cv-project-card');

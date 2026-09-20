@@ -42,10 +42,11 @@
     {{/intro}}
 
     <form id="cv_input_form">
+        {{#show_candidate_info}}
         <!-- Card 1: Candidate Information -->
-        <div class="cv-card">
+        <div class="cv-card" id="card_candidate_info">
             <div class="cv-card-header">
-                <h4><i class="fa fa-user text-primary"></i> {{#str}}step_personal_title, mod_cv{{/str}}</h4>
+                <h4><i class="fa fa-user text-primary"></i> {{personal_title}}</h4>
             </div>
             <div class="cv-card-body">
                 <div class="row">
@@ -94,11 +95,13 @@
                 </div>
             </div>
         </div>
+        {{/show_candidate_info}}
 
+        {{#show_course_education}}
         <!-- Card 2: Course & Education Verification (Course-Aware) -->
-        <div class="cv-card">
+        <div class="cv-card" id="card_course_education">
             <div class="cv-card-header">
-                <h4><i class="fa fa-graduation-cap text-primary"></i> {{#str}}step_course_title, mod_cv{{/str}}</h4>
+                <h4><i class="fa fa-graduation-cap text-primary"></i> {{course_title}}</h4>
             </div>
             <div class="cv-card-body">
                 <div class="row mb-3">
@@ -145,11 +148,12 @@
                 </div>
             </div>
         </div>
+        {{/show_course_education}}
 
         <!-- Card 3: Project Experience -->
         <div class="cv-card">
             <div class="cv-card-header">
-                <h4><i class="fa fa-briefcase text-primary"></i> {{#str}}step_projects_title, mod_cv{{/str}}</h4>
+                <h4><i class="fa fa-briefcase text-primary"></i> {{projects_title}}</h4>
                 <button type="button" class="btn btn-outline-primary btn-sm" id="btn_add_project">
                     <i class="fa fa-plus"></i> {{#str}}btn_add_project, mod_cv{{/str}}
                 </button>
