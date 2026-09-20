@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/cv/backup/moodle2/backup_cv_stepslib.php');
  * Provides the steps to perform one complete backup of the CV instance.
  */
 class backup_cv_activity_task extends backup_activity_task {
-
     /**
      * No specific settings for this activity.
      */
