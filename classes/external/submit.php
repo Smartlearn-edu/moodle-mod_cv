@@ -153,6 +153,19 @@ class submit extends external_api {
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
+
+        $maxattempts = (int) ($cv->maxattempts ?? 0);
+        $attemptsused = $submission ? (int) ($submission->attempts ?? 0) : 0;
+        if ($maxattempts > 0 && $attemptsused >= $maxattempts) {
+            throw new moodle_exception(
+                'error_max_attempts_reached',
+                'mod_cv',
+                '',
+                null,
+                get_string('error_max_attempts_reached', 'mod_cv', $maxattempts)
+            );
+        }
+
         if ($submission) {
             $submission->raw_input = $rawjson;
             $submission->status = 'pending';
@@ -165,6 +178,7 @@ class submit extends external_api {
             $submission->raw_input = $rawjson;
             $submission->ai_output = '';
             $submission->status = 'pending';
+            $submission->attempts = 0;
             $submission->timecreated = $now;
             $submission->timemodified = $now;
             $submission->id = $DB->insert_record('cv_submissions', $submission);
@@ -237,16 +251,25 @@ class submit extends external_api {
         $outputjson = $iscompleted ? $result['outputjson'] : '';
 
         if ($iscompleted) {
+            $attemptsused = (int) ($submission->attempts ?? 0) + 1;
+            $submission->attempts = $attemptsused;
             $submission->ai_output = $outputjson;
             $submission->status = 'completed';
             $submission->timemodified = time();
             $DB->update_record('cv_submissions', $submission);
         }
 
+        $hasattemptlimit = ($maxattempts > 0);
+        $attemptsremaining = $hasattemptlimit ? max(0, $maxattempts - $attemptsused) : -1;
+        $attemptsexhausted = $hasattemptlimit && ($attemptsused >= $maxattempts);
+
         return [
             'status' => true,
             'message' => $iscompleted ? get_string('status_saved', 'mod_cv') : get_string('status_pending', 'mod_cv'),
             'outputjson' => $outputjson,
+            'attempts_used' => $attemptsused,
+            'attempts_remaining' => $attemptsremaining,
+            'attempts_exhausted' => $attemptsexhausted,
         ];
     }
 
@@ -260,6 +283,9 @@ class submit extends external_api {
             'status' => new external_value(PARAM_BOOL, 'Success indicator'),
             'message' => new external_value(PARAM_TEXT, 'Status message'),
             'outputjson' => new external_value(PARAM_RAW, 'JSON encoded AI response from n8n'),
+            'attempts_used' => new external_value(PARAM_INT, 'Number of attempts used so far', VALUE_DEFAULT, 0),
+            'attempts_remaining' => new external_value(PARAM_INT, 'Number of attempts remaining (-1 if unlimited)', VALUE_DEFAULT, -1),
+            'attempts_exhausted' => new external_value(PARAM_BOOL, 'Whether maximum attempts have been reached', VALUE_DEFAULT, false),
         ]);
     }
 }

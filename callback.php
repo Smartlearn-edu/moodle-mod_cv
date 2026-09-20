@@ -94,6 +94,7 @@ $outputjson = is_array($aioutput)
     : (string) $aioutput;
 
 // Update submission record.
+$submission->attempts = (int) ($submission->attempts ?? 0) + 1;
 $submission->ai_output = $outputjson;
 $submission->status = 'completed';
 $submission->timemodified = time();

@@ -71,6 +71,12 @@ function cv_process_instance_data(stdClass $cv): void {
     } else {
         $cv->showsummary = (int) $cv->showsummary;
     }
+
+    if (!isset($cv->maxattempts)) {
+        $cv->maxattempts = 0;
+    } else {
+        $cv->maxattempts = (int) $cv->maxattempts;
+    }
 }
 
 /**

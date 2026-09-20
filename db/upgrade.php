@@ -155,5 +155,47 @@ function xmldb_cv_upgrade(int $oldversion): bool {
         upgrade_mod_savepoint(true, 2026092001, 'cv');
     }
 
+    if ($oldversion < 2026092002) {
+        $tablecv = new xmldb_table('cv');
+
+        // Define field maxattempts to be added to cv table.
+        $maxattempts = new xmldb_field(
+            'maxattempts',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'showsummary'
+        );
+        if (!$dbman->field_exists($tablecv, $maxattempts)) {
+            $dbman->add_field($tablecv, $maxattempts);
+        }
+
+        $tablesubmissions = new xmldb_table('cv_submissions');
+
+        // Define field attempts to be added to cv_submissions table.
+        $attempts = new xmldb_field(
+            'attempts',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'status'
+        );
+        if (!$dbman->field_exists($tablesubmissions, $attempts)) {
+            $dbman->add_field($tablesubmissions, $attempts);
+        }
+
+        // Initialize attempts = 1 for any existing submissions that already have completed output.
+        $DB->execute("UPDATE {cv_submissions} SET attempts = 1 WHERE attempts = 0 AND status = 'completed'");
+
+        // Savepoint reached.
+        upgrade_mod_savepoint(true, 2026092002, 'cv');
+    }
+
     return true;
 }

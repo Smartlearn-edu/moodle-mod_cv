@@ -125,6 +125,18 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->setType('showsummary', PARAM_INT);
         $mform->addHelpButton('showsummary', 'show_summary', 'mod_cv');
 
+        // Attempts & Generation Limit options.
+        $mform->addElement('header', 'attemptoptions', get_string('attempt_settings', 'mod_cv'));
+
+        $attemptoptions = [0 => get_string('unlimited', 'mod_cv')];
+        for ($i = 1; $i <= 20; $i++) {
+            $attemptoptions[$i] = $i;
+        }
+        $mform->addElement('select', 'maxattempts', get_string('max_attempts', 'mod_cv'), $attemptoptions);
+        $mform->setDefault('maxattempts', 0);
+        $mform->setType('maxattempts', PARAM_INT);
+        $mform->addHelpButton('maxattempts', 'max_attempts', 'mod_cv');
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 
@@ -153,5 +165,7 @@ class mod_cv_mod_form extends moodleform_mod {
             (int) $defaultvalues['showreview'] : 1;
         $defaultvalues['showsummary'] = isset($defaultvalues['showsummary']) ?
             (int) $defaultvalues['showsummary'] : 1;
+        $defaultvalues['maxattempts'] = isset($defaultvalues['maxattempts']) ?
+            (int) $defaultvalues['maxattempts'] : 0;
     }
 }
