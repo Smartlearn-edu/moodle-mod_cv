@@ -26,7 +26,18 @@ define([], function() {
     }
 
     /**
-     * Show modal dialog safely across Bootstrap 4, 5, jQuery, and vanilla fallback.
+     * Handle Escape key to close modal.
+     *
+     * @param {KeyboardEvent} e
+     */
+    function onEscapeKey(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            hideModal();
+        }
+    }
+
+    /**
+     * Show modal dialog safely across themes without stacking context conflicts.
      */
     function showModal() {
         if (!modalElement) {
@@ -36,24 +47,51 @@ define([], function() {
             return;
         }
 
-        if (window.bootstrap && window.bootstrap.Modal) {
-            var bsModal = window.bootstrap.Modal.getInstance(modalElement) || new window.bootstrap.Modal(modalElement);
-            bsModal.show();
-            return;
+        // Relocate modal to document.body to escape form/collapsible stacking contexts.
+        if (modalElement.parentElement !== document.body) {
+            document.body.appendChild(modalElement);
         }
 
-        if (window.jQuery && typeof window.jQuery(modalElement).modal === 'function') {
-            window.jQuery(modalElement).modal('show');
-            return;
-        }
+        // Clean up any stale backdrops.
+        var staleBackdrops = document.querySelectorAll('.cv-modal-backdrop, .modal-backdrop');
+        staleBackdrops.forEach(function(b) {
+            b.remove();
+        });
 
-        // Vanilla DOM fallback.
+        // Create backdrop on body.
+        var backdrop = document.createElement('div');
+        backdrop.className = 'cv-modal-backdrop';
+        backdrop.id = 'cv_modal_backdrop';
+        backdrop.addEventListener('click', function(e) {
+            e.preventDefault();
+            hideModal();
+        });
+        document.body.appendChild(backdrop);
+
+        // Display modal.
         modalElement.style.display = 'block';
         modalElement.classList.add('show');
+        modalElement.setAttribute('aria-hidden', 'false');
         document.body.classList.add('modal-open');
-        var backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show cv-modal-backdrop';
-        document.body.appendChild(backdrop);
+
+        // Dismiss if user clicks outside dialog on the modal backdrop container.
+        modalElement.onclick = function(e) {
+            if (e.target === modalElement) {
+                hideModal();
+            }
+        };
+
+        // Listen for Escape key.
+        document.removeEventListener('keydown', onEscapeKey);
+        document.addEventListener('keydown', onEscapeKey);
+
+        // Focus the first input field smoothly.
+        setTimeout(function() {
+            var labelInput = document.getElementById('modal_field_label');
+            if (labelInput) {
+                labelInput.focus();
+            }
+        }, 100);
     }
 
     /**
@@ -63,28 +101,17 @@ define([], function() {
         if (!modalElement) {
             modalElement = document.getElementById('cvFieldModal');
         }
-        if (!modalElement) {
-            return;
+        if (modalElement) {
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.onclick = null;
         }
 
-        if (window.bootstrap && window.bootstrap.Modal) {
-            var bsModal = window.bootstrap.Modal.getInstance(modalElement);
-            if (bsModal) {
-                bsModal.hide();
-                return;
-            }
-        }
-
-        if (window.jQuery && typeof window.jQuery(modalElement).modal === 'function') {
-            window.jQuery(modalElement).modal('hide');
-            return;
-        }
-
-        // Vanilla DOM fallback.
-        modalElement.style.display = 'none';
-        modalElement.classList.remove('show');
         document.body.classList.remove('modal-open');
-        var backdrops = document.querySelectorAll('.cv-modal-backdrop');
+        document.removeEventListener('keydown', onEscapeKey);
+
+        var backdrops = document.querySelectorAll('.cv-modal-backdrop, .modal-backdrop');
         backdrops.forEach(function(b) {
             b.remove();
         });
@@ -423,11 +450,39 @@ define([], function() {
          * @param {Object} types Available types dictionary.
          */
         init: function(fields, sections, types) {
-            currentFields = Array.isArray(fields) ? JSON.parse(JSON.stringify(fields)) : [];
+            var metaEl = document.getElementById('cv_project_fields_metadata');
+            var meta = {};
+            if (metaEl) {
+                try {
+                    meta = JSON.parse(metaEl.textContent || '{}');
+                } catch (e) {
+                    meta = {};
+                }
+            }
+
+            sectionDefs = (sections && Object.keys(sections).length > 0) ? sections : (meta.sections || {});
+            typeDefs = (types && Object.keys(types).length > 0) ? types : (meta.types || {});
+
+            var initialList = [];
+            if (Array.isArray(fields) && fields.length > 0) {
+                initialList = fields;
+            } else {
+                var hiddenInput = document.querySelector('input[name="projectfields"]');
+                if (hiddenInput && hiddenInput.value) {
+                    try {
+                        initialList = JSON.parse(hiddenInput.value);
+                    } catch (err) {
+                        initialList = [];
+                    }
+                }
+            }
+
+            currentFields = Array.isArray(initialList) ? JSON.parse(JSON.stringify(initialList)) : [];
             defaultFieldsBackup = JSON.parse(JSON.stringify(currentFields));
-            sectionDefs = sections || {};
-            typeDefs = types || {};
             modalElement = document.getElementById('cvFieldModal');
+            if (modalElement && modalElement.parentElement !== document.body) {
+                document.body.appendChild(modalElement);
+            }
 
             // Render initial table.
             syncAndRender();
@@ -485,14 +540,14 @@ define([], function() {
                 });
             }
 
-            // Close modal events for vanilla fallback.
+            // Close modal events via delegation.
             if (modalElement) {
-                var closeButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"], .btn-close, .close');
-                closeButtons.forEach(function(btn) {
-                    btn.addEventListener('click', function(e) {
+                modalElement.addEventListener('click', function(e) {
+                    var closeBtn = e.target.closest('[data-bs-dismiss="modal"], [data-dismiss="modal"], .btn-close, .close');
+                    if (closeBtn) {
                         e.preventDefault();
                         hideModal();
-                    });
+                    }
                 });
             }
 

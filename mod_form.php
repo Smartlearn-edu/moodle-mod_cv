@@ -144,9 +144,21 @@ class mod_cv_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'projectfields');
         $mform->setType('projectfields', PARAM_RAW);
 
+        $defaultfields = \mod_cv\fields_manager::get_default_fields();
+        $defaultfieldsjson = json_encode($defaultfields, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $mform->setDefault('projectfields', $defaultfieldsjson);
+
+        $sections = \mod_cv\fields_manager::get_sections();
+        $types = \mod_cv\fields_manager::get_types();
+        $metadatajson = json_encode([
+            'sections' => $sections,
+            'types' => $types,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
         // Container element for interactive field management UI.
         $fieldmanagerhtml = '
         <div id="cv_project_fields_manager" class="cv-fields-manager-container mb-3">
+            <script type="application/json" id="cv_project_fields_metadata">' . $metadatajson . '</script>
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
                     <button type="button" class="btn btn-primary btn-sm" id="btn_add_custom_field">
@@ -181,22 +193,22 @@ class mod_cv_mod_form extends moodleform_mod {
             </div>
 
             <!-- Field Edit/Create Modal -->
-            <div class="modal fade" id="cvFieldModal" tabindex="-1" aria-labelledby="cvFieldModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+            <div class="modal fade" id="cvFieldModal" tabindex="-1" role="dialog" aria-labelledby="cvFieldModalLabel" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="cvFieldModalLabel">' . get_string('add_custom_field', 'mod_cv') . '</h5>
-                            <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="' . get_string('closebuttontitle') . '">&times;</button>
+                            <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="' . get_string('closebuttontitle') . '"><span aria-hidden="true">&times;</span></button>
                         </div>
                         <div class="modal-body">
                             <input type="hidden" id="modal_field_original_key" value="">
                             <div class="mb-3">
                                 <label for="modal_field_label" class="form-label font-weight-bold">' . get_string('field_label', 'mod_cv') . ' <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="modal_field_label" required placeholder="e.g. Project Budget">
+                                <input type="text" class="form-control" id="modal_field_label" placeholder="e.g. Project Budget">
                             </div>
                             <div class="mb-3">
                                 <label for="modal_field_key" class="form-label font-weight-bold">' . get_string('field_key', 'mod_cv') . ' <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="modal_field_key" required placeholder="e.g. project_budget">
+                                <input type="text" class="form-control" id="modal_field_key" placeholder="e.g. project_budget">
                                 <small class="form-text text-muted">Lowercase letters, numbers, and underscores only.</small>
                             </div>
                             <div class="row">
@@ -256,6 +268,9 @@ class mod_cv_mod_form extends moodleform_mod {
 
         $mform->addElement('html', $fieldmanagerhtml);
 
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_cv/form_fields', 'init');
+
         // Standard course module elements.
         $this->standard_coursemodule_elements();
 
@@ -301,31 +316,5 @@ class mod_cv_mod_form extends moodleform_mod {
 
         $fieldsjson = json_encode($fields, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $defaultvalues['projectfields'] = $fieldsjson;
-
-        // Initialize AMD Javascript for the form fields manager.
-        global $PAGE;
-        $sections = \mod_cv\fields_manager::get_sections();
-        $types = \mod_cv\fields_manager::get_types();
-        $PAGE->requires->js_call_amd('mod_cv/form_fields', 'init', [$fields, $sections, $types]);
-    }
-
-    /**
-     * Ensure form fields and AMD module are initialized for new activity creation.
-     */
-    public function definition_after_data() {
-        parent::definition_after_data();
-
-        $mform = $this->_form;
-        $val = $mform->getElementValue('projectfields');
-        if (empty($val)) {
-            $defaultfields = \mod_cv\fields_manager::get_default_fields();
-            $fieldsjson = json_encode($defaultfields, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $mform->setDefault('projectfields', $fieldsjson);
-
-            global $PAGE;
-            $sections = \mod_cv\fields_manager::get_sections();
-            $types = \mod_cv\fields_manager::get_types();
-            $PAGE->requires->js_call_amd('mod_cv/form_fields', 'init', [$defaultfields, $sections, $types]);
-        }
     }
 }

@@ -423,15 +423,97 @@ body.theme-dark .path-mod-cv .alert-danger {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1040;
+    z-index: 10450;
     width: 100vw;
     height: 100vh;
-    background-color: #000000;
-    opacity: 0.5;
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    cursor: pointer;
+}
+
+#cvFieldModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10500;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
 }
 
 #cvFieldModal.show {
-    z-index: 1050;
+    display: block !important;
 }
+
+#cvFieldModal .modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 2rem auto;
+    max-width: 620px;
+    pointer-events: auto;
+    z-index: 10501;
+}
+
+#cvFieldModal .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-clip: padding-box;
+    border-radius: 8px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark mode overrides for Fields Manager and Modal */
+body.smartlearn-dark .cv-fields-manager-container,
+body.theme-dark .cv-fields-manager-container,
+[data-bs-theme="dark"] .cv-fields-manager-container,
+html[data-smartlearn-mode="dark"] .cv-fields-manager-container {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.smartlearn-dark #cvFieldModal .modal-content,
+body.theme-dark #cvFieldModal .modal-content,
+[data-bs-theme="dark"] #cvFieldModal .modal-content,
+html[data-smartlearn-mode="dark"] #cvFieldModal .modal-content {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #f1f5f9;
+}
+
+body.smartlearn-dark #cvFieldModal .modal-header,
+body.theme-dark #cvFieldModal .modal-header,
+[data-bs-theme="dark"] #cvFieldModal .modal-header,
+html[data-smartlearn-mode="dark"] #cvFieldModal .modal-header {
+    border-bottom: 1px solid #334155;
+}
+
+body.smartlearn-dark #cvFieldModal .modal-footer,
+body.theme-dark #cvFieldModal .modal-footer,
+[data-bs-theme="dark"] #cvFieldModal .modal-footer,
+html[data-smartlearn-mode="dark"] #cvFieldModal .modal-footer {
+    border-top: 1px solid #334155;
+}
+
+body.smartlearn-dark #cvFieldModal .form-control,
+body.smartlearn-dark #cvFieldModal .form-select,
+body.theme-dark #cvFieldModal .form-control,
+body.theme-dark #cvFieldModal .form-select,
+[data-bs-theme="dark"] #cvFieldModal .form-control,
+[data-bs-theme="dark"] #cvFieldModal .form-select,
+html[data-smartlearn-mode="dark"] #cvFieldModal .form-control,
+html[data-smartlearn-mode="dark"] #cvFieldModal .form-select {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
 
 

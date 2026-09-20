@@ -180,6 +180,8 @@ $string['section_governance'] = 'إدارة المعنيين والموارد و
 
 $string['field_project_name'] = 'اسم المشروع';
 $string['placeholder_project_name'] = 'Enter project name';
+$string['field_title'] = 'اسم المشروع';
+$string['placeholder_title'] = 'Enter project name';
 $string['field_industry'] = 'مجال العمل / القطاع';
 $string['placeholder_industry'] = 'Ex.: Construction, IT, Healthcare';
 $string['field_organization'] = 'اسم المنظمة / المؤسسة';
@@ -188,6 +190,8 @@ $string['field_job_title'] = 'المسمى الوظيفي';
 $string['placeholder_job_title'] = 'Ex.: Engineer, Manager, Analyst';
 $string['field_project_role'] = 'دورك في المشروع';
 $string['placeholder_project_role'] = 'Ex.: Project Manager, Project Lead, Coordinator';
+$string['field_role'] = 'دورك في المشروع';
+$string['placeholder_role'] = 'Ex.: Project Manager, Project Lead, Coordinator';
 $string['field_start_date'] = 'تاريخ بداية المشروع';
 $string['placeholder_start_date'] = 'Enter start date';
 $string['field_end_date'] = 'تاريخ نهاية المشروع';
