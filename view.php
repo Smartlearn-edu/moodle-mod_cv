@@ -153,6 +153,27 @@ $showcourseeducation = !isset($cv->showcourseeducation) || !empty($cv->showcours
 $showreview = !isset($cv->showreview) || !empty($cv->showreview);
 $showsummary = !isset($cv->showsummary) || !empty($cv->showsummary);
 
+$maxattempts = (int) ($cv->maxattempts ?? 0);
+$attemptsused = (int) ($submission->attempts ?? 0);
+$hasattemptlimit = ($maxattempts > 0);
+$attemptsremaining = $hasattemptlimit ? max(0, $maxattempts - $attemptsused) : -1;
+$attemptsexhausted = $hasattemptlimit && ($attemptsused >= $maxattempts);
+
+$attemptscounttext = '';
+$attemptsremainingtext = '';
+$attemptsexhaustedtext = '';
+if ($hasattemptlimit) {
+    $attemptscounttext = get_string('attempts_count', 'mod_cv', (object) [
+        'used' => $attemptsused,
+        'max' => $maxattempts,
+    ]);
+    if ($attemptsexhausted) {
+        $attemptsexhaustedtext = get_string('attempts_exhausted', 'mod_cv', $maxattempts);
+    } else {
+        $attemptsremainingtext = get_string('attempts_remaining', 'mod_cv', $attemptsremaining);
+    }
+}
+
 $stepnum = 1;
 $personaltitle = '';
 if ($showcandidateinfo) {
@@ -185,6 +206,14 @@ $templatedata = [
     'show_course_education' => $showcourseeducation,
     'show_review' => $showreview,
     'show_summary' => $showsummary,
+    'max_attempts' => $maxattempts,
+    'attempts_used' => $attemptsused,
+    'has_attempt_limit' => $hasattemptlimit,
+    'attempts_remaining' => $attemptsremaining,
+    'attempts_exhausted' => $attemptsexhausted,
+    'attempts_count_text' => $attemptscounttext,
+    'attempts_remaining_text' => $attemptsremainingtext,
+    'attempts_exhausted_text' => $attemptsexhaustedtext,
     'personal_title' => $personaltitle,
     'course_title' => $coursetitle,
     'projects_title' => $projectstitle,
@@ -204,6 +233,11 @@ $templatedata = [
         'show_course_education' => $showcourseeducation,
         'show_review' => $showreview,
         'show_summary' => $showsummary,
+        'max_attempts' => $maxattempts,
+        'attempts_used' => $attemptsused,
+        'has_attempt_limit' => $hasattemptlimit,
+        'attempts_remaining' => $attemptsremaining,
+        'attempts_exhausted' => $attemptsexhausted,
         'default_candidate' => [
             'name' => fullname($USER),
             'email' => $USER->email,

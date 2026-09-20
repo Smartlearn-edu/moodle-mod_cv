@@ -53,6 +53,7 @@ class provider implements
                 'ai_output' => 'privacy:metadata:cv_submissions:ai_output',
                 'timecreated' => 'privacy:metadata:cv_submissions:timecreated',
                 'timemodified' => 'privacy:metadata:cv_submissions:timemodified',
+                'attempts' => 'privacy:metadata:cv_submissions:attempts',
             ],
             'privacy:metadata:cv_submissions'
         );

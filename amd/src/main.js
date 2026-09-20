@@ -287,6 +287,45 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
     }
 
+    /**
+     * Update attempt counts and handle exhausted limit in the UI.
+     *
+     * @param {Object} res
+     */
+    function updateAttemptsUi(res) {
+        if (!res) {
+            return;
+        }
+
+        var badge = document.getElementById('cv_attempts_badge');
+        var submitBtn = document.getElementById('btn_submit_ai');
+        var exhaustedAlert = document.getElementById('cv_exhausted_alert');
+        var notice = document.getElementById('cv_attempts_notice');
+
+        if (badge && res.attempts_used !== undefined && initialConfig.max_attempts > 0) {
+            badge.innerHTML = '<i class="fa fa-refresh"></i> Attempts: ' + res.attempts_used + ' / ' + initialConfig.max_attempts;
+        }
+
+        if (res.attempts_exhausted) {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+            }
+            if (notice) {
+                notice.classList.add('d-none');
+            }
+            if (exhaustedAlert) {
+                exhaustedAlert.innerHTML = '<i class="fa fa-exclamation-triangle"></i> You have reached the maximum allowed attempts (' +
+                    initialConfig.max_attempts + ') for this activity. You can review and download your previously generated dossier below.';
+                exhaustedAlert.classList.remove('d-none');
+            }
+        } else if (res.attempts_remaining !== undefined && res.attempts_remaining >= 0) {
+            if (notice) {
+                notice.innerHTML = '<i class="fa fa-info-circle"></i> You have ' + res.attempts_remaining + ' attempt(s) remaining.';
+                notice.classList.remove('d-none');
+            }
+        }
+    }
+
     var pollTimer = null;
 
     /**
@@ -328,11 +367,12 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                         loadingIndicator.classList.remove('active');
                     }
                     if (submitBtn) {
-                        submitBtn.disabled = false;
+                        submitBtn.disabled = !!res.attempts_exhausted;
                     }
                     if (infoAlert) {
                         infoAlert.classList.add('d-none');
                     }
+                    updateAttemptsUi(res);
                     try {
                         var parsed = JSON.parse(res.outputjson);
                         renderAiOutput(parsed);
@@ -346,11 +386,12 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                         loadingIndicator.classList.remove('active');
                     }
                     if (submitBtn) {
-                        submitBtn.disabled = false;
+                        submitBtn.disabled = !!res.attempts_exhausted;
                     }
                     if (infoAlert) {
                         infoAlert.classList.add('d-none');
                     }
+                    updateAttemptsUi(res);
                 }
             }).catch(function() {
                 pollTimer = setTimeout(check, 5000);
@@ -378,6 +419,13 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 }
             }
             initialConfig = initialData;
+
+            if (initialData.attempts_exhausted) {
+                var initialSubmitBtn = document.getElementById('btn_submit_ai');
+                if (initialSubmitBtn) {
+                    initialSubmitBtn.disabled = true;
+                }
+            }
 
             // Populate existing saved projects or add default empty project.
             if (initialData.saved_projects && initialData.saved_projects.length > 0) {
@@ -667,7 +715,8 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     }])[0].then(function(res) {
                         if (res.status && res.outputjson) {
                             loadingIndicator.classList.remove('active');
-                            submitBtn.disabled = false;
+                            submitBtn.disabled = !!res.attempts_exhausted;
+                            updateAttemptsUi(res);
                             var parsed = JSON.parse(res.outputjson);
                             renderAiOutput(parsed);
                         } else if (res.status) {
