@@ -63,19 +63,33 @@ class check_status extends external_api {
         $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
 
         if (!$submission) {
+            $maxattempts = (int) ($cv->maxattempts ?? 0);
+            $hasattemptlimit = ($maxattempts > 0);
             return [
                 'status' => 'none',
                 'has_output' => false,
                 'outputjson' => '',
+                'attempts_used' => 0,
+                'attempts_remaining' => $hasattemptlimit ? $maxattempts : -1,
+                'attempts_exhausted' => false,
             ];
         }
 
         $hasoutput = !empty($submission->ai_output) && ($submission->status === 'completed' || $submission->status === 'processed');
 
+        $maxattempts = (int) ($cv->maxattempts ?? 0);
+        $attemptsused = (int) ($submission->attempts ?? 0);
+        $hasattemptlimit = ($maxattempts > 0);
+        $attemptsremaining = $hasattemptlimit ? max(0, $maxattempts - $attemptsused) : -1;
+        $attemptsexhausted = $hasattemptlimit && ($attemptsused >= $maxattempts);
+
         return [
             'status' => $submission->status,
             'has_output' => $hasoutput,
             'outputjson' => $hasoutput ? $submission->ai_output : '',
+            'attempts_used' => $attemptsused,
+            'attempts_remaining' => $attemptsremaining,
+            'attempts_exhausted' => $attemptsexhausted,
         ];
     }
 
@@ -89,6 +103,9 @@ class check_status extends external_api {
             'status' => new external_value(PARAM_TEXT, 'Submission status (pending, completed, draft, none)'),
             'has_output' => new external_value(PARAM_BOOL, 'Whether AI output is available'),
             'outputjson' => new external_value(PARAM_RAW, 'JSON encoded AI response from n8n', VALUE_DEFAULT, ''),
+            'attempts_used' => new external_value(PARAM_INT, 'Number of attempts used so far', VALUE_DEFAULT, 0),
+            'attempts_remaining' => new external_value(PARAM_INT, 'Number of attempts remaining (-1 if unlimited)', VALUE_DEFAULT, -1),
+            'attempts_exhausted' => new external_value(PARAM_BOOL, 'Whether maximum attempts have been reached', VALUE_DEFAULT, false),
         ]);
     }
 }
