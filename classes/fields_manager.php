@@ -376,6 +376,103 @@ class fields_manager {
         return self::get_default_fields();
     }
 
+    /** @var array|null In-memory cache for site-level custom sections. */
+    private static ?array $sitecustomsections = null;
+
+    /**
+     * Get site-level custom sections configured in plugin administration.
+     *
+     * Supports line-based configuration (key|Title|icon) and JSON array formats.
+     *
+     * @param bool $resetcache Set true to force re-reading configuration.
+     * @return array Associative array of custom sections keyed by section id.
+     */
+    public static function get_site_custom_sections(bool $resetcache = false): array {
+        if (self::$sitecustomsections !== null && !$resetcache) {
+            return self::$sitecustomsections;
+        }
+
+        $rawconfig = get_config('mod_cv', 'custom_sections');
+        if (empty($rawconfig) || !is_string($rawconfig)) {
+            self::$sitecustomsections = [];
+            return self::$sitecustomsections;
+        }
+
+        $rawconfig = trim($rawconfig);
+        $sections = [];
+
+        // Check for JSON array format.
+        if (str_starts_with($rawconfig, '[') || str_starts_with($rawconfig, '{')) {
+            $decoded = json_decode($rawconfig, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $k => $item) {
+                    if (is_array($item)) {
+                        $id = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($item['id'] ?? $item['key'] ?? '')));
+                        $title = trim((string) ($item['title'] ?? $item['name'] ?? $item['label'] ?? ''));
+                        $icon = trim((string) ($item['icon'] ?? 'fa fa-folder'));
+                    } else if (is_string($item)) {
+                        $id = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', (string) $k));
+                        $title = trim($item);
+                        $icon = 'fa fa-folder';
+                    } else {
+                        continue;
+                    }
+
+                    if ($id !== '' && $title !== '') {
+                        if (!str_starts_with($icon, 'fa ') && !str_starts_with($icon, 'fas ') && !str_starts_with($icon, 'far ')) {
+                            $icon = 'fa ' . $icon;
+                        }
+                        $sections[$id] = [
+                            'id' => $id,
+                            'title' => $title,
+                            'icon' => $icon,
+                            'is_custom' => true,
+                        ];
+                    }
+                }
+                self::$sitecustomsections = $sections;
+                return self::$sitecustomsections;
+            }
+        }
+
+        // Parse line-by-line pipe-delimited format: key|Title|icon.
+        $lines = preg_split('/[\r\n]+/', $rawconfig);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue;
+            }
+
+            $parts = explode('|', $line);
+            $rawid = trim($parts[0] ?? '');
+            $id = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $rawid));
+            $title = trim($parts[1] ?? '');
+            $icon = trim($parts[2] ?? 'fa fa-folder');
+
+            if ($id === '') {
+                continue;
+            }
+
+            if ($title === '') {
+                $title = ucfirst(str_replace('_', ' ', $id));
+            }
+
+            if (!str_starts_with($icon, 'fa ') && !str_starts_with($icon, 'fas ') && !str_starts_with($icon, 'far ')) {
+                $icon = 'fa ' . $icon;
+            }
+
+            $sections[$id] = [
+                'id' => $id,
+                'title' => $title,
+                'icon' => $icon,
+                'is_custom' => true,
+            ];
+        }
+
+        self::$sitecustomsections = $sections;
+        return self::$sitecustomsections;
+    }
+
     /**
      * Sanitize and validate an array of field definitions.
      *
@@ -383,13 +480,7 @@ class fields_manager {
      * @return array Sanitized field definitions sorted by sortorder.
      */
     public static function sanitize_fields(array $rawfields): array {
-        $validsections = [
-            self::SECTION_BASIC,
-            self::SECTION_TIMELINE,
-            self::SECTION_DELIVERABLES,
-            self::SECTION_GOVERNANCE,
-            self::SECTION_CUSTOM,
-        ];
+        $validsections = array_keys(self::get_sections());
 
         $validtypes = [
             self::TYPE_TEXT,
@@ -505,7 +596,7 @@ class fields_manager {
      * @return array Associative array of section data.
      */
     public static function get_sections(): array {
-        return [
+        $sections = [
             self::SECTION_BASIC => [
                 'id' => self::SECTION_BASIC,
                 'title' => get_string('section_basic', 'mod_cv'),
@@ -532,6 +623,14 @@ class fields_manager {
                 'icon' => 'fa fa-list-alt',
             ],
         ];
+
+        // Merge site-level custom sections.
+        $customsections = self::get_site_custom_sections();
+        foreach ($customsections as $key => $secdata) {
+            $sections[$key] = $secdata;
+        }
+
+        return $sections;
     }
 
     /**

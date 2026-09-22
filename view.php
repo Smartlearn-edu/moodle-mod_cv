@@ -228,6 +228,7 @@ $templatedata = [
     'export_url' => (new moodle_url('/mod/cv/export.php', ['id' => $cm->id]))->out(false),
     'initial_data_json' => json_encode([
         'project_fields' => $projectfields,
+        'sections' => \mod_cv\fields_manager::get_sections(),
         'saved_projects' => $savedprojects,
         'saved_course' => $savedcourse,
         'ai_output' => $aioutput,

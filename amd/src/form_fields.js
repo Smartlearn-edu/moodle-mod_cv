@@ -238,6 +238,22 @@ define([], function() {
             errorAlert.textContent = '';
         }
 
+        // Dynamically ensure all configured sections exist in the select dropdown.
+        if (sectionSelect && sectionDefs && Object.keys(sectionDefs).length > 0) {
+            var existingKeys = [];
+            for (var optIdx = 0; optIdx < sectionSelect.options.length; optIdx++) {
+                existingKeys.push(sectionSelect.options[optIdx].value);
+            }
+            Object.keys(sectionDefs).forEach(function(secKey) {
+                if (existingKeys.indexOf(secKey) === -1) {
+                    var newOpt = document.createElement('option');
+                    newOpt.value = secKey;
+                    newOpt.textContent = sectionDefs[secKey].title || secKey;
+                    sectionSelect.appendChild(newOpt);
+                }
+            });
+        }
+
         if (field) {
             // Edit mode.
             if (modalTitle) {

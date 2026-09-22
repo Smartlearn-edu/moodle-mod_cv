@@ -114,6 +114,18 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             'custom': { title: 'Additional Custom Details', icon: 'fa fa-list-alt' }
         };
 
+        if (initialConfig.sections && typeof initialConfig.sections === 'object') {
+            Object.keys(initialConfig.sections).forEach(function(k) {
+                var s = initialConfig.sections[k];
+                if (s && s.title) {
+                    sectionsMeta[k] = {
+                        title: s.title,
+                        icon: s.icon || 'fa fa-folder'
+                    };
+                }
+            });
+        }
+
         // Group active fields by section preserving sort order.
         var grouped = {};
         var sectionOrder = ['basic', 'timeline', 'deliverables', 'governance', 'custom'];

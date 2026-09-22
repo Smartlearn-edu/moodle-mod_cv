@@ -70,4 +70,20 @@ if ($ADMIN->fulltree) {
         60,
         8
     ));
+
+    $settings->add(new admin_setting_heading(
+        'mod_cv/sections_settings',
+        get_string('settings_sections_heading', 'mod_cv'),
+        get_string('settings_sections_heading_desc', 'mod_cv')
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'mod_cv/custom_sections',
+        get_string('custom_sections', 'mod_cv'),
+        get_string('custom_sections_desc', 'mod_cv'),
+        '',
+        PARAM_RAW,
+        60,
+        6
+    ));
 }

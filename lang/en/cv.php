@@ -248,6 +248,11 @@ $string['status_active'] = 'Active';
 $string['status_hidden'] = 'Hidden';
 $string['field_is_standard'] = 'Standard Field';
 $string['field_is_custom'] = 'Custom Field';
+$string['settings_sections_heading'] = 'Custom Project Sections';
+$string['settings_sections_heading_desc'] = 'Define global custom sections for project experience entries that will be available across all CV activities on the site.';
+$string['custom_sections'] = 'Site-Level Custom Sections';
+$string['custom_sections_desc'] = 'Enter one section per line using the format: <code>key|Title|icon</code> (icon is optional, e.g., <code>tech_stack|Technical Stack & Tools|fa-code</code> or any FontAwesome icon class). When instructors configure fields in an activity, these sections will appear in the Section selector.';
+
 $string['section_basic'] = 'Basic Project Information';
 $string['section_timeline'] = 'Project Timeline';
 $string['section_deliverables'] = 'Core Project Experience & Deliverables';

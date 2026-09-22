@@ -251,6 +251,11 @@ $string['status_active'] = 'نشط';
 $string['status_hidden'] = 'مخفي';
 $string['field_is_standard'] = 'حقل قياسي';
 $string['field_is_custom'] = 'حقل مخصص';
+$string['settings_sections_heading'] = 'أقسام المشاريع المخصصة';
+$string['settings_sections_heading_desc'] = 'حدد أقساماً مخصصة عامة لمدخلات خبرة المشاريع لتكون متاحة عبر جميع أنشطة السيرة الذاتية في الموقع.';
+$string['custom_sections'] = 'أقسام مخصصة على مستوى الموقع';
+$string['custom_sections_desc'] = 'أدخل قسماً واحداً في كل سطر بالتنسيق التالي: <code>key|Title|icon</code> (الأيقونة اختيارية، مثل: <code>tech_stack|التقنيات والأدوات المستخدمة|fa-code</code>). عند قيام المعلمين بتهيئة الحقول في النشاط، ستظهر هذه الأقسام في قائمة الأقسام.';
+
 $string['section_basic'] = 'معلومات المشروع الأساسية';
 $string['section_timeline'] = 'الجدول الزمني للمشروع';
 $string['section_deliverables'] = 'خبرات ومخرجات المشروع الرئيسية';

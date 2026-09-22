@@ -155,6 +155,11 @@ class mod_cv_mod_form extends moodleform_mod {
             'types' => $types,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+        $sectionoptionshtml = '';
+        foreach ($sections as $seckey => $secdata) {
+            $sectionoptionshtml .= '<option value="' . s($seckey) . '">' . s($secdata['title']) . '</option>';
+        }
+
         // Container element for interactive field management UI.
         $fieldmanagerhtml = '
         <div id="cv_project_fields_manager" class="cv-fields-manager-container mb-3">
@@ -226,11 +231,7 @@ class mod_cv_mod_form extends moodleform_mod {
                                 <div class="col-md-6 mb-3">
                                     <label for="modal_field_section" class="form-label font-weight-bold">' . get_string('field_section', 'mod_cv') . '</label>
                                     <select class="form-select custom-select" id="modal_field_section">
-                                        <option value="basic">' . get_string('section_basic', 'mod_cv') . '</option>
-                                        <option value="timeline">' . get_string('section_timeline', 'mod_cv') . '</option>
-                                        <option value="deliverables">' . get_string('section_deliverables', 'mod_cv') . '</option>
-                                        <option value="governance">' . get_string('section_governance', 'mod_cv') . '</option>
-                                        <option value="custom">' . get_string('section_custom', 'mod_cv') . '</option>
+                                        ' . $sectionoptionshtml . '
                                     </select>
                                 </div>
                             </div>
