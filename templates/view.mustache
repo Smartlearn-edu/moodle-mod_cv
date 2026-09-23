@@ -21,11 +21,8 @@
 }}
 <div class="mod-cv-container" id="mod_cv_app" data-cmid="{{cmid}}">
 
-    <!-- Header / Banner -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-            <h2 class="mb-0">{{activityname}}</h2>
-        </div>
+    <!-- Header / Banner Badges -->
+    <div class="d-flex justify-content-end align-items-center mb-4 flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2 flex-wrap">
             {{#has_attempt_limit}}
                 <span class="badge badge-info bg-info text-white font-weight-bold px-3 py-2" id="cv_attempts_badge"><i class="fa fa-refresh"></i> {{attempts_count_text}}</span>
