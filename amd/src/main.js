@@ -25,6 +25,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
     var projectCounter = 0;
     var initialConfig = {};
+    var lastAiOutputData = null;
 
     /**
      * Escape HTML helper.
@@ -290,57 +291,118 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
     }
 
     /**
-     * Render AI response inside the preview container.
+     * Copy text to clipboard using modern API with fallback.
      *
-     * @param {Object} data
+     * @param {string} text
+     * @return {Promise}
      */
-    function renderAiOutput(data) {
-        var showReview = (initialConfig.show_review !== false);
+    function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function(resolve, reject) {
+            var textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                textArea.remove();
+                if (successful) {
+                    resolve();
+                } else {
+                    reject(new Error('execCommand copy failed'));
+                }
+            } catch (err) {
+                textArea.remove();
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * Format entire dossier into clean plain text for clipboard copying.
+     *
+     * @param {Object|string} data
+     * @return {string}
+     */
+    function formatDossierPlainText(data) {
+        if (!data) {
+            return '';
+        }
+        if (typeof data === 'string') {
+            try {
+                data = JSON.parse(data);
+            } catch (e) {
+                return data;
+            }
+        }
+        var lines = [];
         var showSummary = (initialConfig.show_summary !== false);
-
-        var directDownloadBtn = document.getElementById('btn_download_direct');
-        if (directDownloadBtn) {
-            directDownloadBtn.classList.remove('d-none');
+        if (showSummary && data.summary) {
+            lines.push('--- PROFESSIONAL SUMMARY ---');
+            lines.push(data.summary.trim());
+            lines.push('');
         }
-
-        var container = document.getElementById('cv_output_display');
-        var reviewSection = document.getElementById('cv_review_section');
-
-        if (!showReview) {
-            if (reviewSection) {
-                reviewSection.classList.add('d-none');
-            }
-            var infoAlert = document.getElementById('cv_info_alert');
-            if (infoAlert) {
-                infoAlert.innerHTML = '<i class="fa fa-check-circle text-success"></i> Application generated successfully! You can download your official PDF dossier now.';
-                infoAlert.classList.remove('d-none');
-            }
-            return;
+        if (data.projects && Array.isArray(data.projects)) {
+            data.projects.forEach(function(proj, i) {
+                var pTitle = proj.title || ('Project #' + (i + 1));
+                lines.push('--- ' + pTitle.toUpperCase() + ' ---');
+                if (proj.role) {
+                    lines.push('Role: ' + proj.role);
+                }
+                var desc = proj.formatted_description || proj.description || '';
+                if (desc) {
+                    lines.push(desc.trim());
+                }
+                lines.push('');
+            });
         }
+        return lines.join('\n').trim();
+    }
 
-        if (!container) {
-            return;
-        }
-
+    /**
+     * Build structured HTML representation of AI output.
+     *
+     * @param {Object|string} data
+     * @param {string} prefix
+     * @return {string}
+     */
+    function buildOutputHtml(data, prefix) {
+        var showSummary = (initialConfig.show_summary !== false);
+        var pfx = prefix || '';
         var html = '';
+
+        if (typeof data === 'string') {
+            try {
+                data = JSON.parse(data);
+            } catch (e) {
+                return '<div class="cv-output-box"><div id="' + pfx + 'raw_out" style="white-space: pre-wrap;" class="cv-formatted-output p-3 border rounded">' + escapeHtml(data) + '</div></div>';
+            }
+        }
 
         // Executive Summary if present and enabled.
         if (showSummary && data.summary) {
+            var sumId = pfx + 'summary_content';
             html += '<div class="cv-output-box">' +
                 '<div class="cv-output-header">' +
                 '   <h5 class="mb-0 font-weight-bold text-primary"><i class="fa fa-id-badge"></i> Professional Summary</h5>' +
-                '   <button type="button" class="btn btn-outline-secondary btn-sm cv-copy-btn" data-copy-target="#summary_content">' +
+                '   <button type="button" class="btn btn-outline-secondary btn-sm cv-copy-btn" data-copy-target="#' + sumId + '">' +
                 '       <i class="fa fa-clipboard"></i> Copy' +
                 '   </button>' +
                 '</div>' +
-                '<div id="summary_content" class="cv-summary-content">' + escapeHtml(data.summary) + '</div>' +
+                '<div id="' + sumId + '" class="cv-summary-content">' + escapeHtml(data.summary) + '</div>' +
                 '</div>';
         }
 
         // Projects list if present.
         if (data.projects && Array.isArray(data.projects)) {
             data.projects.forEach(function(proj, i) {
-                var pId = 'proj_out_' + (i + 1);
+                var pId = pfx + 'proj_out_' + (i + 1);
                 var formattedText = proj.formatted_description || proj.description || JSON.stringify(proj, null, 2);
 
                 html += '<div class="cv-output-box">' +
@@ -358,14 +420,101 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             });
         } else if (typeof data === 'string') {
             html += '<div class="cv-output-box">' +
-                '<div id="raw_out" style="white-space: pre-wrap;" class="cv-formatted-output p-3 border rounded">' + escapeHtml(data) + '</div>' +
+                '<div id="' + pfx + 'raw_out" style="white-space: pre-wrap;" class="cv-formatted-output p-3 border rounded">' + escapeHtml(data) + '</div>' +
                 '</div>';
         }
 
-        container.innerHTML = html;
-        if (reviewSection) {
-            reviewSection.classList.remove('d-none');
-            reviewSection.scrollIntoView({ behavior: 'smooth' });
+        return html;
+    }
+
+    /**
+     * Show modal dialog safely across themes.
+     *
+     * @param {HTMLElement} modalEl
+     */
+    function showModal(modalEl) {
+        if (!modalEl) {
+            return;
+        }
+        if (modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+        var backdrop = document.getElementById('cv_output_modal_backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'cv-modal-backdrop';
+            backdrop.id = 'cv_output_modal_backdrop';
+            document.body.appendChild(backdrop);
+        }
+        modalEl.style.display = 'block';
+        modalEl.classList.add('show');
+        modalEl.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+
+        modalEl.onclick = function(e) {
+            if (e.target === modalEl) {
+                hideModal(modalEl);
+            }
+        };
+    }
+
+    /**
+     * Hide modal dialog safely.
+     *
+     * @param {HTMLElement} modalEl
+     */
+    function hideModal(modalEl) {
+        if (!modalEl) {
+            return;
+        }
+        modalEl.style.display = 'none';
+        modalEl.classList.remove('show');
+        modalEl.setAttribute('aria-hidden', 'true');
+        modalEl.onclick = null;
+        document.body.classList.remove('modal-open');
+        var backdrop = document.getElementById('cv_output_modal_backdrop');
+        if (backdrop && backdrop.parentNode) {
+            backdrop.parentNode.removeChild(backdrop);
+        }
+    }
+
+    /**
+     * Render AI response inside the preview container and modal window.
+     *
+     * @param {Object} data
+     */
+    function renderAiOutput(data, autoOpenModal) {
+        lastAiOutputData = data;
+        var showReview = (initialConfig.show_review !== false);
+
+        var container = document.getElementById('cv_output_display');
+        var modalContainer = document.getElementById('cv_modal_output_display');
+        var reviewSection = document.getElementById('cv_review_section');
+        var openModalDirectBtn = document.getElementById('btn_open_output_modal_direct');
+
+        if (container) {
+            container.innerHTML = buildOutputHtml(data, 'main_');
+        }
+        if (modalContainer) {
+            modalContainer.innerHTML = buildOutputHtml(data, 'modal_');
+        }
+
+        if (openModalDirectBtn) {
+            openModalDirectBtn.classList.remove('d-none');
+        }
+
+        if (showReview) {
+            if (reviewSection) {
+                reviewSection.classList.remove('d-none');
+                if (autoOpenModal) {
+                    reviewSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        } else if (autoOpenModal) {
+            var modalEl = document.getElementById('cvOutputModal');
+            if (modalEl) {
+                showModal(modalEl);
+            }
         }
     }
 
@@ -457,7 +606,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     updateAttemptsUi(res);
                     try {
                         var parsed = JSON.parse(res.outputjson);
-                        renderAiOutput(parsed);
+                        renderAiOutput(parsed, true);
                     } catch (e) {
                         // Ignore parse error.
                     }
@@ -520,7 +669,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
 
             // Render existing AI output if already processed.
             if (initialData.ai_output) {
-                renderAiOutput(initialData.ai_output);
+                renderAiOutput(initialData.ai_output, false);
             }
 
             // If already pending from a previous asynchronous request, resume polling.
@@ -574,23 +723,96 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             document.addEventListener('click', function(e) {
                 var copyBtn = e.target.closest('.cv-copy-btn');
                 if (copyBtn) {
+                    e.preventDefault();
                     var targetId = copyBtn.getAttribute('data-copy-target');
-                    var targetEl = document.querySelector(targetId);
-                    if (targetEl) {
-                        var textToCopy = targetEl.innerText || targetEl.textContent;
-                        navigator.clipboard.writeText(textToCopy).then(function() {
-                            var originalHtml = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fa fa-check text-success"></i> Copied!';
-                            copyBtn.classList.remove('btn-outline-secondary');
-                            copyBtn.classList.add('btn-success');
-                            setTimeout(function() {
-                                copyBtn.innerHTML = originalHtml;
-                                copyBtn.classList.remove('btn-success');
+                    var textToCopy = '';
+
+                    if (targetId === '#cv_output_display' || targetId === '#cv_modal_output_display') {
+                        textToCopy = formatDossierPlainText(lastAiOutputData);
+                        if (!textToCopy) {
+                            var targetEl = document.querySelector(targetId);
+                            if (targetEl) {
+                                var clone = targetEl.cloneNode(true);
+                                var btns = clone.querySelectorAll('button, .btn, .cv-copy-btn');
+                                btns.forEach(function(b) {
+                                    b.remove();
+                                });
+                                textToCopy = (clone.innerText || clone.textContent || '').trim();
+                            }
+                        }
+                    } else if (targetId) {
+                        var singleEl = document.querySelector(targetId);
+                        if (singleEl) {
+                            textToCopy = (singleEl.innerText || singleEl.textContent || '').trim();
+                        }
+                    }
+
+                    if (!textToCopy) {
+                        return;
+                    }
+
+                    copyTextToClipboard(textToCopy).then(function() {
+                        var originalHtml = copyBtn.innerHTML;
+                        var isAll = (targetId === '#cv_output_display' || targetId === '#cv_modal_output_display');
+                        var copiedLabel = isAll ? (initialConfig.copied_all_text || initialConfig.copied_text || 'Copied!') :
+                            (initialConfig.copied_text || 'Copied!');
+
+                        copyBtn.innerHTML = '<i class="fa fa-check text-white"></i> ' + escapeHtml(copiedLabel);
+                        var hadOutlineSecondary = copyBtn.classList.contains('btn-outline-secondary');
+                        var hadPrimary = copyBtn.classList.contains('btn-primary');
+
+                        copyBtn.classList.remove('btn-outline-secondary', 'btn-primary');
+                        copyBtn.classList.add('btn-success');
+                        setTimeout(function() {
+                            copyBtn.innerHTML = originalHtml;
+                            copyBtn.classList.remove('btn-success');
+                            if (hadOutlineSecondary) {
                                 copyBtn.classList.add('btn-outline-secondary');
-                            }, 2000);
-                        }).catch(function(err) {
-                            notification.exception(err);
-                        });
+                            }
+                            if (hadPrimary) {
+                                copyBtn.classList.add('btn-primary');
+                            }
+                        }, 2000);
+                    }).catch(function(err) {
+                        notification.exception(err);
+                    });
+                }
+            });
+
+            // Modal popup button listeners.
+            var openModalBtn = document.getElementById('btn_open_output_modal');
+            if (openModalBtn) {
+                openModalBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var modalDialog = document.getElementById('cvOutputModal');
+                    showModal(modalDialog);
+                });
+            }
+
+            var openModalDirectBtn = document.getElementById('btn_open_output_modal_direct');
+            if (openModalDirectBtn) {
+                openModalDirectBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var modalDialog = document.getElementById('cvOutputModal');
+                    showModal(modalDialog);
+                });
+            }
+
+            var modalElement = document.getElementById('cvOutputModal');
+            if (modalElement) {
+                modalElement.querySelectorAll('[data-dismiss="modal"], [data-bs-dismiss="modal"], .close, .btn-close').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        hideModal(modalElement);
+                    });
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' || e.keyCode === 27) {
+                    var m = document.getElementById('cvOutputModal');
+                    if (m && m.classList.contains('show')) {
+                        hideModal(m);
                     }
                 }
             });
@@ -832,7 +1054,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                             submitBtn.disabled = !!res.attempts_exhausted;
                             updateAttemptsUi(res);
                             var parsed = JSON.parse(res.outputjson);
-                            renderAiOutput(parsed);
+                            renderAiOutput(parsed, true);
                         } else if (res.status) {
                             // Asynchronous background processing: start polling.
                             startPolling(cmid);

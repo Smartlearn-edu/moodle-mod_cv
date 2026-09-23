@@ -515,5 +515,102 @@ html[data-smartlearn-mode="dark"] #cvFieldModal .form-select {
     color: #f8fafc;
 }
 
+/* ==========================================================================
+   Output Header Actions & Output Modal
+   ========================================================================== */
+.path-mod-cv .cv-output-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#cvOutputModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10500;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+}
+
+#cvOutputModal.show {
+    display: block !important;
+}
+
+#cvOutputModal .modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 2rem auto;
+    max-width: 900px;
+    pointer-events: auto;
+    z-index: 10501;
+}
+
+#cvOutputModal .modal-content {
+    background-color: var(--cv-card-bg, #ffffff);
+    color: var(--cv-text, #1e293b);
+    border: 1px solid var(--cv-border, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+}
+
+#cvOutputModal .modal-header {
+    background-color: var(--cv-card-bg, #ffffff);
+    border-bottom: 1px solid var(--cv-border, #e2e8f0);
+    padding: 16px 20px;
+}
+
+#cvOutputModal .modal-body {
+    padding: 20px;
+    max-height: calc(85vh - 140px);
+    overflow-y: auto;
+}
+
+#cvOutputModal .modal-footer {
+    border-top: 1px solid var(--cv-border, #e2e8f0);
+    padding: 14px 20px;
+    background-color: var(--cv-card-bg, #ffffff);
+}
+
+/* Dark mode overrides for Output Modal */
+body.smartlearn-dark #cvOutputModal .modal-content,
+body.theme-dark #cvOutputModal .modal-content,
+[data-bs-theme="dark"] #cvOutputModal .modal-content,
+html[data-smartlearn-mode="dark"] #cvOutputModal .modal-content {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: #f1f5f9;
+}
+
+body.smartlearn-dark #cvOutputModal .modal-header,
+body.theme-dark #cvOutputModal .modal-header,
+[data-bs-theme="dark"] #cvOutputModal .modal-header,
+html[data-smartlearn-mode="dark"] #cvOutputModal .modal-header,
+body.smartlearn-dark #cvOutputModal .modal-footer,
+body.theme-dark #cvOutputModal .modal-footer,
+[data-bs-theme="dark"] #cvOutputModal .modal-footer,
+html[data-smartlearn-mode="dark"] #cvOutputModal .modal-footer {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+body.smartlearn-dark #cvOutputModal .close,
+body.theme-dark #cvOutputModal .close,
+[data-bs-theme="dark"] #cvOutputModal .close,
+html[data-smartlearn-mode="dark"] #cvOutputModal .close,
+body.smartlearn-dark #cvOutputModal .btn-close,
+body.theme-dark #cvOutputModal .btn-close,
+[data-bs-theme="dark"] #cvOutputModal .btn-close,
+html[data-smartlearn-mode="dark"] #cvOutputModal .btn-close {
+    color: #ffffff;
+    filter: invert(1);
+    opacity: 0.8;
+}
+
 
 

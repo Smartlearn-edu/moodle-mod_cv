@@ -206,23 +206,30 @@
                         <i class="fa fa-magic"></i> {{#str}}btn_generate_ai, mod_cv{{/str}}
                     </button>
                     {{^show_review}}
-                    <a href="{{export_url}}" class="btn btn-success btn-lg px-4 shadow-sm {{^has_output}}d-none{{/has_output}}" id="btn_download_direct" target="_blank">
-                        <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
-                    </a>
+                    <button type="button" class="btn btn-outline-primary btn-lg px-4 shadow-sm {{^has_output}}d-none{{/has_output}}" id="btn_open_output_modal_direct">
+                        <i class="fa fa-window-maximize"></i> {{#str}}btn_view_output_window, mod_cv{{/str}}
+                    </button>
                     {{/show_review}}
                 </div>
             </div>
         </div>
     </form>
 
-    {{#show_review}}
-    <!-- Card 5: Review & Download Section -->
+    <!-- Card 5: Output & Review Window -->
     <div id="cv_review_section" class="cv-card {{^has_output}}d-none{{/has_output}}">
-        <div class="cv-card-header">
-            <h4><i class="fa fa-check-circle text-success"></i> {{#str}}preview_heading, mod_cv{{/str}}</h4>
-            <a href="{{export_url}}" class="btn btn-success btn-sm" id="btn_export_pdf" target="_blank">
-                <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
-            </a>
+        <div class="cv-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 class="mb-0"><i class="fa fa-check-circle text-success"></i> {{#str}}preview_heading, mod_cv{{/str}}</h4>
+            <div class="cv-output-header-actions d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-primary btn-sm cv-copy-btn" id="btn_copy_all_output" data-copy-target="#cv_output_display">
+                    <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn_open_output_modal">
+                    <i class="fa fa-expand"></i> {{#str}}btn_modal_window, mod_cv{{/str}}
+                </button>
+                <a href="{{export_url}}" class="btn btn-outline-success btn-sm" id="btn_export_pdf" target="_blank">
+                    <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
+                </a>
+            </div>
         </div>
         <div class="cv-card-body">
             <div id="cv_output_display">
@@ -230,7 +237,45 @@
             </div>
         </div>
     </div>
-    {{/show_review}}
+
+    <!-- Modal: AI Output Window Popup -->
+    <div class="modal fade" id="cvOutputModal" tabindex="-1" role="dialog" aria-labelledby="cvOutputModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title font-weight-bold" id="cvOutputModalLabel">
+                        <i class="fa fa-id-card text-primary"></i> {{#str}}modal_output_title, mod_cv{{/str}}
+                    </h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-primary btn-sm cv-copy-btn" id="btn_copy_modal_output" data-copy-target="#cv_modal_output_display">
+                            <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
+                        </button>
+                        <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="{{#str}}closebuttontitle{{/str}}">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="cv_modal_output_display">
+                        <!-- Cloned or rendered output -->
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+                    <a href="{{export_url}}" class="btn btn-outline-success" id="btn_modal_export_pdf" target="_blank">
+                        <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">
+                            {{#str}}closebuttontitle{{/str}}
+                        </button>
+                        <button type="button" class="btn btn-primary cv-copy-btn" data-copy-target="#cv_modal_output_display">
+                            <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

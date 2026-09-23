@@ -246,6 +246,8 @@ $templatedata = [
             'name' => fullname($USER),
             'email' => $USER->email,
         ],
+        'copied_text' => get_string('copied_to_clipboard', 'mod_cv'),
+        'copied_all_text' => get_string('copied_all_success', 'mod_cv'),
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 ];
 
