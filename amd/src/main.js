@@ -646,6 +646,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
     }
 
     var pollTimer = null;
+    var pollCount = 0;
 
     /**
      * Poll status for asynchronous processing.
@@ -655,7 +656,9 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
     function startPolling(cmid) {
         if (pollTimer) {
             clearTimeout(pollTimer);
+            pollTimer = null;
         }
+        pollCount = 0;
 
         var loadingIndicator = document.getElementById('cv_loading_indicator');
         var submitBtn = document.getElementById('btn_submit_ai');
@@ -672,16 +675,63 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             errorAlert.classList.add('d-none');
         }
         if (infoAlert) {
-            infoAlert.innerHTML = '<i class="fa fa-info-circle"></i> Your application is being processed by AI in the background. Please wait...';
+            infoAlert.className = 'alert alert-info d-none text-left';
+            infoAlert.innerHTML = '<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">' +
+                '<span><i class="fa fa-info-circle"></i> Your application is being processed by AI in the background. Please wait...</span>' +
+                '<button type="button" class="btn btn-sm btn-outline-secondary" id="btn_cancel_cv_polling"><i class="fa fa-times"></i> Stop Waiting / Retry</button>' +
+                '</div>';
             infoAlert.classList.remove('d-none');
+
+            var cancelBtn = document.getElementById('btn_cancel_cv_polling');
+            if (cancelBtn) {
+                cancelBtn.onclick = function() {
+                    if (pollTimer) {
+                        clearTimeout(pollTimer);
+                        pollTimer = null;
+                    }
+                    if (loadingIndicator) {
+                        loadingIndicator.classList.remove('active');
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = !!initialConfig.attempts_exhausted;
+                    }
+                    infoAlert.innerHTML = '<i class="fa fa-info-circle"></i> Polling stopped. You can edit your details or click "Generate with AI" to submit again.';
+                };
+            }
         }
 
         function check() {
+            pollCount++;
+
+            // Auto-timeout after ~80 seconds (20 polls * 4s) to prevent infinite spinner if n8n failed.
+            if (pollCount > 20) {
+                if (loadingIndicator) {
+                    loadingIndicator.classList.remove('active');
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = !!initialConfig.attempts_exhausted;
+                }
+                if (infoAlert) {
+                    infoAlert.className = 'alert alert-warning text-left';
+                    infoAlert.innerHTML = '<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">' +
+                        '<span><i class="fa fa-exclamation-triangle"></i> AI processing is taking longer than expected. If n8n encountered an error, please check n8n Executions or click "Generate with AI" to retry.</span>' +
+                        '<button type="button" class="btn btn-sm btn-outline-dark" id="btn_retry_cv_polling"><i class="fa fa-refresh"></i> Check Again</button>' +
+                        '</div>';
+                    var retryBtn = document.getElementById('btn_retry_cv_polling');
+                    if (retryBtn) {
+                        retryBtn.onclick = function() {
+                            startPolling(cmid);
+                        };
+                    }
+                }
+                return;
+            }
+
             ajax.call([{
                 methodname: 'mod_cv_check_status',
                 args: { cmid: cmid }
             }])[0].then(function(res) {
-                console.log('[mod_cv DEBUG] Status check received:', res);
+                console.log('[mod_cv DEBUG] Status check received (poll #' + pollCount + '):', res);
                 if (res.debug_json) {
                     updateDebugUi(res.debug_json, res.outputjson);
                 }
