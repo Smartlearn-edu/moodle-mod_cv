@@ -22,15 +22,7 @@
 <div class="mod-cv-container" id="mod_cv_app" data-cmid="{{cmid}}">
 
     <!-- Header / Banner Badges -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="btn btn-warning btn-sm font-weight-bold text-dark shadow-sm" id="btn_open_debug_modal" title="View Live n8n & Database Diagnostic Inspector">
-                <i class="fa fa-bug"></i> Live Debug & n8n Inspector
-            </button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn_scroll_debug_card" title="Scroll to on-page diagnostics panel">
-                <i class="fa fa-terminal"></i> Show Diagnostic Panel
-            </button>
-        </div>
+    <div class="d-flex justify-content-end align-items-center mb-4 flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2 flex-wrap">
             {{#has_attempt_limit}}
                 <span class="badge badge-info bg-info text-white font-weight-bold px-3 py-2" id="cv_attempts_badge"><i class="fa fa-refresh"></i> {{attempts_count_text}}</span>
@@ -243,113 +235,6 @@
         </div>
     </div>
 
-    <!-- Live AI & n8n Diagnostics Section (Always visible for testing & debugging) -->
-    <div class="cv-card border border-warning shadow-sm mt-4 mb-4" id="cv_debug_card">
-        <div class="cv-card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2 py-3 border-bottom border-warning">
-            <h4 class="mb-0 text-dark font-weight-bold">
-                <i class="fa fa-bug text-warning"></i> AI & n8n Live Diagnostic Inspector (فحص وتشخيص البيانات المستلمة والمحفوظة)
-            </h4>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <button type="button" class="btn btn-primary btn-sm shadow-sm" id="btn_ajax_refresh_debug">
-                    <i class="fa fa-refresh"></i> Refresh DB Status (AJAX)
-                </button>
-                <button type="button" class="btn btn-warning btn-sm text-dark font-weight-bold shadow-sm" id="btn_open_debug_modal_from_card">
-                    <i class="fa fa-window-maximize"></i> Open in Popup Window
-                </button>
-            </div>
-        </div>
-        <div class="cv-card-body p-3">
-            <!-- Status badges row -->
-            <div class="row g-2 mb-3">
-                <div class="col-md-3 col-sm-6">
-                    <div class="p-2 border rounded bg-white h-100">
-                        <small class="text-muted d-block font-weight-bold">Current Student</small>
-                        <span class="font-weight-bold text-primary">{{debug.current_fullname}}</span>
-                        <small class="text-muted d-block">ID: {{debug.current_user_id}} ({{debug.current_username}})</small>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="p-2 border rounded bg-white h-100">
-                        <small class="text-muted d-block font-weight-bold">Moodle DB Submission</small>
-                        <span class="badge bg-primary text-white font-weight-bold px-2 py-1">ID: #{{debug.submission_id}}</span>
-                        <span class="badge bg-secondary text-white font-weight-bold px-2 py-1" id="debug_top_sub_status">{{debug.submission_status}}</span>
-                        <small class="text-muted d-block">Modified: <span id="debug_top_sub_modified">{{debug.submission_timemodified}}</span></small>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="p-2 border rounded bg-white h-100">
-                        <small class="text-muted d-block font-weight-bold">Last Callback from n8n</small>
-                        <span class="font-weight-bold text-success" id="debug_top_cb_time">{{debug.last_callback_time}}</span>
-                        <small class="text-muted d-block">Target SubID: <span id="debug_top_cb_subid">{{debug.last_callback_subid}}</span></small>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="p-2 border rounded bg-white h-100">
-                        <small class="text-muted d-block font-weight-bold">Saved ai_output Size</small>
-                        <span class="font-weight-bold text-dark" id="debug_top_output_size">{{debug.ai_output_length}} bytes</span>
-                        <small class="text-muted d-block">Attempts: {{debug.submission_attempts}}</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Two-column debug view: Box 1 (Received from n8n) vs Box 2 (Processed & Saved in DB) -->
-            <div class="row g-3">
-                <!-- 1. What was received from n8n -->
-                <div class="col-lg-6">
-                    <div class="card h-100 border-success">
-                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-2">
-                            <strong class="font-weight-bold"><i class="fa fa-cloud-download"></i> 1. Exactly Received from n8n (Webhook Callback)</strong>
-                            <button type="button" class="btn btn-light btn-sm cv-copy-btn py-0 px-2 font-weight-bold" data-copy-target="#debug_display_callback_box">
-                                <i class="fa fa-clipboard"></i> Copy
-                            </button>
-                        </div>
-                        <div class="card-body p-2 bg-light">
-                            <div class="d-flex justify-content-between small text-muted mb-2 px-1">
-                                <span>Received at: <strong class="text-dark" id="debug_cb_time">{{debug.last_callback_time}}</strong></span>
-                                <span>Target SubID: <strong class="text-dark" id="debug_cb_subid">{{debug.last_callback_subid}}</strong></span>
-                                <span>Error: <strong class="text-danger" id="debug_cb_error">{{debug.last_callback_error}}</strong></span>
-                            </div>
-                            <pre class="bg-dark text-success p-3 rounded mb-0" style="max-height: 420px; overflow: auto; font-family: monospace; font-size: 12px; line-height: 1.4;" id="debug_display_callback_box">{{{debug.last_callback_raw_pretty}}}</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. What is processed & saved in Moodle database -->
-                <div class="col-lg-6">
-                    <div class="card h-100 border-info">
-                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center py-2">
-                            <strong class="font-weight-bold"><i class="fa fa-database"></i> 2. What is Stored in DB for this Student (ai_output)</strong>
-                            <button type="button" class="btn btn-light btn-sm cv-copy-btn py-0 px-2 font-weight-bold" data-copy-target="#debug_display_ai_output_box">
-                                <i class="fa fa-clipboard"></i> Copy
-                            </button>
-                        </div>
-                        <div class="card-body p-2 bg-light">
-                            <div class="d-flex justify-content-between small text-muted mb-2 px-1">
-                                <span>SubID: <strong class="text-dark">#{{debug.submission_id}}</strong> (User {{debug.current_user_id}})</span>
-                                <span>Status: <strong class="badge bg-secondary text-white" id="debug_sub_status">{{debug.submission_status}}</strong></span>
-                                <span>Modified: <strong class="text-dark" id="debug_sub_time">{{debug.submission_timemodified}}</strong></span>
-                            </div>
-                            <pre class="bg-dark text-info p-3 rounded mb-0" style="max-height: 420px; overflow: auto; font-family: monospace; font-size: 12px; line-height: 1.4;" id="debug_display_ai_output_box">{{{debug.ai_output_pretty}}}</pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Outgoing submission payload accordion/details -->
-            <details class="mt-3 border rounded p-2 bg-white">
-                <summary class="font-weight-bold text-secondary" style="cursor: pointer;">
-                    <i class="fa fa-paper-plane"></i> 3. View Outgoing Payload / Student Input sent to n8n
-                </summary>
-                <div class="pt-2">
-                    <p class="small text-muted mb-1">
-                        Webhook URL called: <code>{{debug.current_webhookurl}}</code> | Last sent: {{debug.last_submit_time}} | Synchronous result: {{debug.last_submit_completed}}
-                    </p>
-                    <pre class="bg-dark text-light p-3 rounded mb-0" style="max-height: 300px; overflow: auto; font-family: monospace; font-size: 11px;">{{{debug.raw_input_pretty}}}</pre>
-                </div>
-            </details>
-        </div>
-    </div>
-
     <!-- Modal: AI Output Window Popup -->
     <div class="modal fade" id="cvOutputModal" tabindex="-1" role="dialog" aria-labelledby="cvOutputModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
@@ -359,9 +244,6 @@
                         <i class="fa fa-id-card text-primary"></i> {{#str}}modal_output_title, mod_cv{{/str}}
                     </h5>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-outline-warning btn-sm" id="btn_modal_open_debug">
-                            <i class="fa fa-bug"></i> Inspect Live Debug
-                        </button>
                         <button type="button" class="btn btn-primary btn-sm cv-copy-btn" id="btn_copy_modal_output" data-copy-target="#cv_modal_output_display">
                             <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
                         </button>
@@ -387,82 +269,6 @@
                             <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Dedicated AI & n8n Live Debug Inspector Popup -->
-    <div class="modal fade" id="cvDebugModal" tabindex="-1" role="dialog" aria-labelledby="cvDebugModalLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
-            <div class="modal-content border-warning shadow-lg">
-                <div class="modal-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title font-weight-bold text-warning" id="cvDebugModalLabel">
-                        <i class="fa fa-bug"></i> AI & n8n Live Diagnostic Inspector (فحص وتشخيص البيانات المستلمة)
-                    </h5>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-primary btn-sm" id="btn_modal_ajax_refresh_debug">
-                            <i class="fa fa-refresh"></i> Refresh DB Status (AJAX)
-                        </button>
-                        <button type="button" class="btn-close close text-white" id="btn_close_debug_modal" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="modal-body p-3">
-                    <div class="alert alert-info py-2 small mb-3">
-                        <i class="fa fa-info-circle"></i>
-                        Student: <strong>{{debug.current_fullname}}</strong> (ID: {{debug.current_user_id}}) |
-                        Submission ID: <strong>#{{debug.submission_id}}</strong> |
-                        Status: <strong class="badge bg-secondary text-white" id="debug_modal_status_badge">{{debug.submission_status}}</strong> |
-                        Last Saved: <strong id="debug_modal_sub_time">{{debug.submission_timemodified}}</strong>
-                    </div>
-
-                    <div class="row g-3">
-                        <!-- Modal Box 1: Received from n8n -->
-                        <div class="col-lg-6">
-                            <div class="card h-100 border-success">
-                                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-2">
-                                    <strong class="font-weight-bold"><i class="fa fa-cloud-download"></i> 1. Exactly Received from n8n</strong>
-                                    <button type="button" class="btn btn-light btn-xs cv-copy-btn py-0 px-2 font-weight-bold" data-copy-target="#debug_modal_display_callback">
-                                        <i class="fa fa-clipboard"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="card-body p-2 bg-light">
-                                    <div class="small text-muted mb-1 d-flex justify-content-between">
-                                        <span>Received: <strong class="text-dark" id="debug_modal_cb_time">{{debug.last_callback_time}}</strong></span>
-                                        <span>Target SubID: <strong class="text-dark" id="debug_modal_cb_subid">{{debug.last_callback_subid}}</strong></span>
-                                    </div>
-                                    <pre class="bg-dark text-success p-3 rounded mb-0" style="max-height: 450px; overflow: auto; font-size: 12px; line-height: 1.4;" id="debug_modal_display_callback">{{{debug.last_callback_raw_pretty}}}</pre>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal Box 2: Saved in DB -->
-                        <div class="col-lg-6">
-                            <div class="card h-100 border-info">
-                                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center py-2">
-                                    <strong class="font-weight-bold"><i class="fa fa-database"></i> 2. Saved in Moodle DB (ai_output)</strong>
-                                    <button type="button" class="btn btn-light btn-xs cv-copy-btn py-0 px-2 font-weight-bold" data-copy-target="#debug_modal_display_ai_output">
-                                        <i class="fa fa-clipboard"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="card-body p-2 bg-light">
-                                    <div class="small text-muted mb-1 d-flex justify-content-between">
-                                        <span>SubID: <strong>#{{debug.submission_id}}</strong></span>
-                                        <span>Size: <strong id="debug_modal_output_size">{{debug.ai_output_length}} bytes</strong></span>
-                                    </div>
-                                    <pre class="bg-dark text-info p-3 rounded mb-0" style="max-height: 450px; overflow: auto; font-size: 12px; line-height: 1.4;" id="debug_modal_display_ai_output">{{{debug.ai_output_pretty}}}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary" id="btn_close_debug_modal_footer" data-bs-dismiss="modal" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="btn_modal_ajax_refresh_debug2">
-                        <i class="fa fa-refresh"></i> Refresh DB Status (AJAX)
-                    </button>
                 </div>
             </div>
         </div>
