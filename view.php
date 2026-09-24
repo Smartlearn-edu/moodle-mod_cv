@@ -191,6 +191,57 @@ $projectstitle = $stepnum . '. ' . get_string('step_projects_title_content', 'mo
 
 $projectfields = \mod_cv\fields_manager::get_fields($cv);
 
+$rawcallback = get_config('mod_cv', 'debug_last_callback_raw') ?: '';
+$rawcallbackpretty = $rawcallback;
+$decodedcb = json_decode($rawcallback, true);
+if (is_array($decodedcb)) {
+    $rawcallbackpretty = json_encode($decodedcb, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+$rawaioutput = $submission->ai_output ?? '';
+$rawaioutputpretty = $rawaioutput;
+$decodedai = json_decode($rawaioutput, true);
+if (is_array($decodedai)) {
+    $rawaioutputpretty = json_encode($decodedai, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+$rawinputstr = $submission->raw_input ?? '';
+$rawinputpretty = $rawinputstr;
+$decodedin = json_decode($rawinputstr, true);
+if (is_array($decodedin)) {
+    $rawinputpretty = json_encode($decodedin, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+$debugdata = [
+    'current_user_id' => (int) $USER->id,
+    'current_username' => $USER->username,
+    'current_fullname' => fullname($USER),
+    'current_cmid' => (int) $cm->id,
+    'current_cvid' => (int) $cv->id,
+    'current_webhookurl' => !empty($cv->webhookurl) ? $cv->webhookurl : (get_config('mod_cv', 'default_webhook_url') ?: 'None'),
+    'has_submission_record' => !empty($submission),
+    'submission_id' => !empty($submission->id) ? (int) $submission->id : 0,
+    'submission_status' => $submission->status ?? 'none',
+    'submission_attempts' => $submission->attempts ?? 0,
+    'submission_timemodified' => !empty($submission->timemodified) ? date('Y-m-d H:i:s', $submission->timemodified) : 'Never',
+    'has_ai_output' => !empty($submission->ai_output),
+    'ai_output_raw' => $rawaioutput,
+    'ai_output_pretty' => $rawaioutputpretty,
+    'ai_output_length' => strlen($rawaioutput),
+    'raw_input_pretty' => $rawinputpretty,
+    'last_callback_time' => !empty(get_config('mod_cv', 'debug_last_callback_time')) ? date('Y-m-d H:i:s', get_config('mod_cv', 'debug_last_callback_time')) : 'None yet',
+    'last_callback_subid' => get_config('mod_cv', 'debug_last_callback_subid') ?: 'None',
+    'last_callback_userid' => get_config('mod_cv', 'debug_last_callback_userid') ?: 'None',
+    'last_callback_raw' => $rawcallback,
+    'last_callback_raw_pretty' => $rawcallbackpretty,
+    'last_callback_error' => get_config('mod_cv', 'debug_last_callback_error') ?: 'None',
+    'last_submit_time' => !empty(get_config('mod_cv', 'debug_last_submit_time')) ? date('Y-m-d H:i:s', get_config('mod_cv', 'debug_last_submit_time')) : 'None yet',
+    'last_submit_subid' => get_config('mod_cv', 'debug_last_submit_subid') ?: 'None',
+    'last_submit_userid' => get_config('mod_cv', 'debug_last_submit_userid') ?: 'None',
+    'last_submit_webhookurl' => get_config('mod_cv', 'debug_last_submit_webhookurl') ?: 'None',
+    'last_submit_completed' => get_config('mod_cv', 'debug_last_submit_completed') ?: 'None',
+];
+
 $templatedata = [
     'cmid' => $cm->id,
     'activityname' => format_string($cv->name),
@@ -226,6 +277,7 @@ $templatedata = [
     'has_output' => !empty($aioutput),
     'is_pending' => $ispending,
     'export_url' => (new moodle_url('/mod/cv/export.php', ['id' => $cm->id]))->out(false),
+    'debug' => $debugdata,
     'initial_data_json' => json_encode([
         'project_fields' => $projectfields,
         'sections' => \mod_cv\fields_manager::get_sections(),
@@ -248,6 +300,7 @@ $templatedata = [
         ],
         'copied_text' => get_string('copied_to_clipboard', 'mod_cv'),
         'copied_all_text' => get_string('copied_all_success', 'mod_cv'),
+        'debug' => $debugdata,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 ];
 

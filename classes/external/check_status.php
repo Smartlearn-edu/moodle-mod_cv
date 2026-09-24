@@ -62,9 +62,30 @@ class check_status extends external_api {
         $cv = $DB->get_record('cv', ['id' => $cm->instance], '*', MUST_EXIST);
         $submission = $DB->get_record('cv_submissions', ['cvid' => $cv->id, 'userid' => $USER->id]);
 
+        $maxattempts = (int) ($cv->maxattempts ?? 0);
+        $hasattemptlimit = ($maxattempts > 0);
+
+        $debuginfo = [
+            'checked_at' => date('Y-m-d H:i:s'),
+            'current_user_id' => (int) $USER->id,
+            'current_fullname' => fullname($USER),
+            'cmid' => (int) $cm->id,
+            'cvid' => (int) $cv->id,
+            'has_submission' => !empty($submission),
+            'submission_id' => !empty($submission) ? (int) $submission->id : 0,
+            'submission_status' => !empty($submission) ? $submission->status : 'none',
+            'submission_attempts' => !empty($submission) ? (int) $submission->attempts : 0,
+            'submission_timemodified' => !empty($submission->timemodified) ? date('Y-m-d H:i:s', $submission->timemodified) : 'Never',
+            'ai_output_length' => !empty($submission->ai_output) ? strlen($submission->ai_output) : 0,
+            'ai_output_raw' => !empty($submission->ai_output) ? $submission->ai_output : '',
+            'last_callback_time' => !empty(get_config('mod_cv', 'debug_last_callback_time')) ? date('Y-m-d H:i:s', get_config('mod_cv', 'debug_last_callback_time')) : 'None yet',
+            'last_callback_subid' => get_config('mod_cv', 'debug_last_callback_subid') ?: 'None',
+            'last_callback_userid' => get_config('mod_cv', 'debug_last_callback_userid') ?: 'None',
+            'last_callback_raw' => get_config('mod_cv', 'debug_last_callback_raw') ?: '(Empty)',
+            'last_callback_error' => get_config('mod_cv', 'debug_last_callback_error') ?: 'None',
+        ];
+
         if (!$submission) {
-            $maxattempts = (int) ($cv->maxattempts ?? 0);
-            $hasattemptlimit = ($maxattempts > 0);
             return [
                 'status' => 'none',
                 'has_output' => false,
@@ -72,14 +93,13 @@ class check_status extends external_api {
                 'attempts_used' => 0,
                 'attempts_remaining' => $hasattemptlimit ? $maxattempts : -1,
                 'attempts_exhausted' => false,
+                'debug_json' => json_encode($debuginfo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ];
         }
 
         $hasoutput = !empty($submission->ai_output) && ($submission->status === 'completed' || $submission->status === 'processed');
 
-        $maxattempts = (int) ($cv->maxattempts ?? 0);
         $attemptsused = (int) ($submission->attempts ?? 0);
-        $hasattemptlimit = ($maxattempts > 0);
         $attemptsremaining = $hasattemptlimit ? max(0, $maxattempts - $attemptsused) : -1;
         $attemptsexhausted = $hasattemptlimit && ($attemptsused >= $maxattempts);
 
@@ -90,6 +110,7 @@ class check_status extends external_api {
             'attempts_used' => $attemptsused,
             'attempts_remaining' => $attemptsremaining,
             'attempts_exhausted' => $attemptsexhausted,
+            'debug_json' => json_encode($debuginfo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         ];
     }
 
@@ -106,6 +127,7 @@ class check_status extends external_api {
             'attempts_used' => new external_value(PARAM_INT, 'Number of attempts used so far', VALUE_DEFAULT, 0),
             'attempts_remaining' => new external_value(PARAM_INT, 'Number of attempts remaining (-1 if unlimited)', VALUE_DEFAULT, -1),
             'attempts_exhausted' => new external_value(PARAM_BOOL, 'Whether maximum attempts have been reached', VALUE_DEFAULT, false),
+            'debug_json' => new external_value(PARAM_RAW, 'Debug information JSON string', VALUE_DEFAULT, ''),
         ]);
     }
 }

@@ -557,6 +557,94 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
         }
     }
 
+    /**
+     * Update diagnostic debug cards and modal with latest state.
+     *
+     * @param {Object|string} debugObj
+     * @param {string} outputJson
+     */
+    function updateDebugUi(debugObj, outputJson) {
+        if (!debugObj) {
+            return;
+        }
+        var dbg = debugObj;
+        if (typeof dbg === 'string') {
+            try {
+                dbg = JSON.parse(debugObj);
+            } catch (e) {
+                return;
+            }
+        }
+
+        console.log('[mod_cv DEBUG] Diagnostic state update:', dbg);
+
+        // Update submission status.
+        var statusEls = document.querySelectorAll('#debug_top_sub_status, #debug_sub_status, #debug_modal_status_badge');
+        statusEls.forEach(function(el) {
+            el.textContent = dbg.submission_status || '';
+        });
+
+        // Update submission modified time.
+        var timeEls = document.querySelectorAll('#debug_top_sub_modified, #debug_sub_time, #debug_modal_sub_time');
+        timeEls.forEach(function(el) {
+            el.textContent = dbg.submission_timemodified || '';
+        });
+
+        // Update callback received time.
+        var cbTimeEls = document.querySelectorAll('#debug_top_cb_time, #debug_cb_time, #debug_modal_cb_time');
+        cbTimeEls.forEach(function(el) {
+            el.textContent = dbg.last_callback_time || 'None yet';
+        });
+
+        // Update callback target subid.
+        var cbSubidEls = document.querySelectorAll('#debug_top_cb_subid, #debug_cb_subid, #debug_modal_cb_subid');
+        cbSubidEls.forEach(function(el) {
+            el.textContent = dbg.last_callback_subid || 'None';
+        });
+
+        // Update callback error.
+        var cbErrEl = document.getElementById('debug_cb_error');
+        if (cbErrEl) {
+            cbErrEl.textContent = dbg.last_callback_error || 'None';
+        }
+
+        // Format and update callback payload.
+        var rawCb = dbg.last_callback_raw || '';
+        if (rawCb) {
+            try {
+                var parsedCb = JSON.parse(rawCb);
+                rawCb = JSON.stringify(parsedCb, null, 2);
+            } catch (e) {
+                // Keep raw string.
+            }
+        }
+        var cbBoxEls = document.querySelectorAll('#debug_display_callback_box, #debug_modal_display_callback');
+        cbBoxEls.forEach(function(el) {
+            el.textContent = rawCb || '(Empty)';
+        });
+
+        // Format and update ai_output.
+        var rawAi = outputJson || dbg.ai_output_raw || '';
+        if (rawAi) {
+            try {
+                var parsedAi = JSON.parse(rawAi);
+                rawAi = JSON.stringify(parsedAi, null, 2);
+            } catch (e) {
+                // Keep raw string.
+            }
+        }
+        var aiBoxEls = document.querySelectorAll('#debug_display_ai_output_box, #debug_modal_display_ai_output');
+        aiBoxEls.forEach(function(el) {
+            el.textContent = rawAi || '(Empty)';
+        });
+
+        // Update size.
+        var sizeEls = document.querySelectorAll('#debug_top_output_size, #debug_modal_output_size');
+        sizeEls.forEach(function(el) {
+            el.textContent = (rawAi ? rawAi.length : 0) + ' bytes';
+        });
+    }
+
     var pollTimer = null;
 
     /**
@@ -593,6 +681,10 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 methodname: 'mod_cv_check_status',
                 args: { cmid: cmid }
             }])[0].then(function(res) {
+                console.log('[mod_cv DEBUG] Status check received:', res);
+                if (res.debug_json) {
+                    updateDebugUi(res.debug_json, res.outputjson);
+                }
                 if (res.has_output && res.outputjson) {
                     if (loadingIndicator) {
                         loadingIndicator.classList.remove('active');
@@ -608,7 +700,7 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                         var parsed = JSON.parse(res.outputjson);
                         renderAiOutput(parsed, true);
                     } catch (e) {
-                        // Ignore parse error.
+                        renderAiOutput(res.outputjson, true);
                     }
                 } else if (res.status === 'pending') {
                     pollTimer = setTimeout(check, 4000);
@@ -624,7 +716,8 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     }
                     updateAttemptsUi(res);
                 }
-            }).catch(function() {
+            }).catch(function(err) {
+                console.warn('[mod_cv DEBUG] Polling check failed, retry in 5s:', err);
                 pollTimer = setTimeout(check, 5000);
             });
         }
@@ -670,6 +763,12 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             // Render existing AI output if already processed.
             if (initialData.ai_output) {
                 renderAiOutput(initialData.ai_output, false);
+            }
+
+            // Initialize diagnostic debug UI.
+            if (initialData.debug) {
+                var initialOutputStr = initialData.ai_output ? JSON.stringify(initialData.ai_output) : '';
+                updateDebugUi(initialData.debug, initialOutputStr);
             }
 
             // If already pending from a previous asynchronous request, resume polling.
@@ -808,11 +907,91 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 });
             }
 
+            var debugModalElement = document.getElementById('cvDebugModal');
+            if (debugModalElement) {
+                debugModalElement.querySelectorAll('[data-dismiss="modal"], [data-bs-dismiss="modal"], .close, .btn-close').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        hideModal(debugModalElement);
+                    });
+                });
+            }
+
+            var openDebugBtns = document.querySelectorAll('#btn_open_debug_modal, #btn_open_debug_modal_from_card, #btn_modal_open_debug');
+            openDebugBtns.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (debugModalElement) {
+                        showModal(debugModalElement);
+                    }
+                });
+            });
+
+            var scrollDebugBtn = document.getElementById('btn_scroll_debug_card');
+            if (scrollDebugBtn) {
+                scrollDebugBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var card = document.getElementById('cv_debug_card');
+                    if (card) {
+                        card.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+
+            function refreshDebugStatus() {
+                var btns = document.querySelectorAll('#btn_ajax_refresh_debug, #btn_modal_ajax_refresh_debug, #btn_modal_ajax_refresh_debug2');
+                btns.forEach(function(b) {
+                    b.disabled = true;
+                    b.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Checking DB...';
+                });
+
+                ajax.call([{
+                    methodname: 'mod_cv_check_status',
+                    args: { cmid: cmid }
+                }])[0].then(function(res) {
+                    btns.forEach(function(b) {
+                        b.disabled = false;
+                        b.innerHTML = '<i class="fa fa-refresh"></i> Refresh DB Status (AJAX)';
+                    });
+                    console.log('[mod_cv DEBUG] Manual refresh result:', res);
+                    if (res.debug_json) {
+                        updateDebugUi(res.debug_json, res.outputjson);
+                    }
+                    updateAttemptsUi(res);
+                    if (res.has_output && res.outputjson) {
+                        try {
+                            var parsed = JSON.parse(res.outputjson);
+                            renderAiOutput(parsed, false);
+                        } catch (e) {
+                            renderAiOutput(res.outputjson, false);
+                        }
+                    }
+                }).catch(function(err) {
+                    btns.forEach(function(b) {
+                        b.disabled = false;
+                        b.innerHTML = '<i class="fa fa-refresh"></i> Refresh DB Status (AJAX)';
+                    });
+                    console.error('[mod_cv DEBUG] Manual refresh error:', err);
+                });
+            }
+
+            var refreshBtns = document.querySelectorAll('#btn_ajax_refresh_debug, #btn_modal_ajax_refresh_debug, #btn_modal_ajax_refresh_debug2');
+            refreshBtns.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    refreshDebugStatus();
+                });
+            });
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' || e.keyCode === 27) {
                     var m = document.getElementById('cvOutputModal');
                     if (m && m.classList.contains('show')) {
                         hideModal(m);
+                    }
+                    var dbgM = document.getElementById('cvDebugModal');
+                    if (dbgM && dbgM.classList.contains('show')) {
+                        hideModal(dbgM);
                     }
                 }
             });
@@ -1049,12 +1228,20 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                             course_info: courseInfo
                         }
                     }])[0].then(function(res) {
+                        console.log('[mod_cv DEBUG] Submit response received:', res);
+                        if (res.debug_json) {
+                            updateDebugUi(res.debug_json, res.outputjson);
+                        }
                         if (res.status && res.outputjson) {
                             loadingIndicator.classList.remove('active');
                             submitBtn.disabled = !!res.attempts_exhausted;
                             updateAttemptsUi(res);
-                            var parsed = JSON.parse(res.outputjson);
-                            renderAiOutput(parsed, true);
+                            try {
+                                var parsed = JSON.parse(res.outputjson);
+                                renderAiOutput(parsed, true);
+                            } catch (e) {
+                                renderAiOutput(res.outputjson, true);
+                            }
                         } else if (res.status) {
                             // Asynchronous background processing: start polling.
                             startPolling(cmid);

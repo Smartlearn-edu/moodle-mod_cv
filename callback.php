@@ -65,9 +65,14 @@ if (!empty($expectedtoken)) {
     }
 }
 
+// Save received raw payload globally for instant debugging and diagnostics.
+set_config('debug_last_callback_time', time(), 'mod_cv');
+set_config('debug_last_callback_raw', substr($rawinput, 0, 50000), 'mod_cv');
+
 // Validate submission ID.
 $submissionid = isset($data['submission_id']) ? (int) $data['submission_id'] : 0;
 if ($submissionid <= 0) {
+    set_config('debug_last_callback_error', 'Invalid submission_id: ' . $submissionid, 'mod_cv');
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Missing or invalid submission_id.']);
     exit;
@@ -75,6 +80,7 @@ if ($submissionid <= 0) {
 
 $submission = $DB->get_record('cv_submissions', ['id' => $submissionid]);
 if (!$submission) {
+    set_config('debug_last_callback_error', 'Submission record not found for ID: ' . $submissionid, 'mod_cv');
     http_response_code(404);
     echo json_encode(['success' => false, 'message' => 'Submission record not found.']);
     exit;
@@ -83,6 +89,7 @@ if (!$submission) {
 // Extract AI output.
 $aioutput = $data['ai_output'] ?? $data['output'] ?? null;
 if (empty($aioutput)) {
+    set_config('debug_last_callback_error', 'Missing ai_output in payload for ID: ' . $submissionid, 'mod_cv');
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Missing ai_output data.']);
     exit;
@@ -100,9 +107,23 @@ $submission->status = 'completed';
 $submission->timemodified = time();
 $DB->update_record('cv_submissions', $submission);
 
+// Save debug data for the matched submission.
+set_config('debug_last_callback_subid', $submissionid, 'mod_cv');
+set_config('debug_last_callback_userid', $submission->userid, 'mod_cv');
+set_config('debug_last_callback_cvid', $submission->cvid, 'mod_cv');
+set_config('debug_last_callback_output', substr($outputjson, 0, 50000), 'mod_cv');
+set_config('debug_last_callback_error', '', 'mod_cv');
+
 http_response_code(200);
 echo json_encode([
     'success' => true,
     'message' => 'AI output successfully received and saved for submission #' . $submissionid,
+    'debug' => [
+        'submission_id' => $submissionid,
+        'userid' => $submission->userid,
+        'cvid' => $submission->cvid,
+        'output_length' => strlen($outputjson),
+        'saved_at' => date('Y-m-d H:i:s'),
+    ],
 ]);
 exit;
