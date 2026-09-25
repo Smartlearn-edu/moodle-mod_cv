@@ -352,9 +352,6 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
             data.projects.forEach(function(proj, i) {
                 var pTitle = proj.title || ('Project #' + (i + 1));
                 lines.push('--- ' + pTitle.toUpperCase() + ' ---');
-                if (proj.role) {
-                    lines.push('Role: ' + proj.role);
-                }
                 var desc = proj.formatted_description || proj.description || '';
                 if (desc) {
                     lines.push(desc.trim());
@@ -412,7 +409,6 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                     '       <i class="fa fa-clipboard"></i> Copy' +
                     '   </button>' +
                     '</div>' +
-                    (proj.role ? '<p class="text-muted small mb-2"><strong>Role:</strong> ' + escapeHtml(proj.role) + '</p>' : '') +
                     '<div id="' + pId + '" style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;" class="cv-formatted-output p-3 border rounded">' +
                     escapeHtml(formattedText) +
                     '</div>' +
@@ -703,6 +699,17 @@ define(['core/ajax', 'core/notification'], function(ajax, notification) {
                 }
             }
             initialConfig = initialData;
+
+            if (initialData.activity_name) {
+                var modalLabel = document.getElementById('cvOutputModalLabel');
+                if (modalLabel) {
+                    modalLabel.innerHTML = '<i class="fa fa-id-card text-primary"></i> ' + escapeHtml(initialData.activity_name);
+                }
+                var reviewHeader = document.querySelector('#cv_review_section .cv-card-header h4');
+                if (reviewHeader) {
+                    reviewHeader.innerHTML = '<i class="fa fa-check-circle text-success"></i> ' + escapeHtml(initialData.activity_name);
+                }
+            }
 
             if (initialData.attempts_exhausted) {
                 var initialSubmitBtn = document.getElementById('btn_submit_ai');

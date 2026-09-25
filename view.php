@@ -227,6 +227,7 @@ $templatedata = [
     'is_pending' => $ispending,
     'export_url' => (new moodle_url('/mod/cv/export.php', ['id' => $cm->id]))->out(false),
     'initial_data_json' => json_encode([
+        'activity_name' => format_string($cv->name),
         'project_fields' => $projectfields,
         'sections' => \mod_cv\fields_manager::get_sections(),
         'saved_projects' => $savedprojects,

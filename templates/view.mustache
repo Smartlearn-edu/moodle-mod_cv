@@ -215,7 +215,7 @@
     <!-- Card 5: Output & Review Window -->
     <div id="cv_review_section" class="cv-card {{^has_output}}d-none{{/has_output}}">
         <div class="cv-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h4 class="mb-0"><i class="fa fa-check-circle text-success"></i> {{#str}}preview_heading, mod_cv{{/str}}</h4>
+            <h4 class="mb-0"><i class="fa fa-check-circle text-success"></i> {{#activityname}}{{activityname}}{{/activityname}}{{^activityname}}{{#str}}preview_heading, mod_cv{{/str}}{{/activityname}}</h4>
             <div class="cv-output-header-actions d-flex align-items-center gap-2">
                 <button type="button" class="btn btn-primary btn-sm cv-copy-btn" id="btn_copy_all_output" data-copy-target="#cv_output_display">
                     <i class="fa fa-clipboard"></i> {{#str}}btn_copy_all, mod_cv{{/str}}
@@ -241,7 +241,7 @@
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <h5 class="modal-title font-weight-bold" id="cvOutputModalLabel">
-                        <i class="fa fa-id-card text-primary"></i> {{#str}}modal_output_title, mod_cv{{/str}}
+                        <i class="fa fa-id-card text-primary"></i> {{#activityname}}{{activityname}}{{/activityname}}{{^activityname}}{{#str}}modal_output_title, mod_cv{{/str}}{{/activityname}}
                     </h5>
                     <div class="d-flex align-items-center gap-2">
                         <button type="button" class="btn btn-primary btn-sm cv-copy-btn" id="btn_copy_modal_output" data-copy-target="#cv_modal_output_display">
