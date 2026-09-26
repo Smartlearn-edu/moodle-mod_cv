@@ -223,9 +223,11 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btn_open_output_modal">
                     <i class="fa fa-expand"></i> {{#str}}btn_modal_window, mod_cv{{/str}}
                 </button>
+                <!-- PDF export button (kept for future reference):
                 <a href="{{export_url}}" class="btn btn-outline-success btn-sm" id="btn_export_pdf" target="_blank">
                     <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
                 </a>
+                -->
             </div>
         </div>
         <div class="cv-card-body">
@@ -257,10 +259,12 @@
                         <!-- Cloned or rendered output -->
                     </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+                <div class="modal-footer d-flex justify-content-end flex-wrap gap-2">
+                    <!-- PDF export modal button (kept for future reference):
                     <a href="{{export_url}}" class="btn btn-outline-success" id="btn_modal_export_pdf" target="_blank">
                         <i class="fa fa-download"></i> {{#str}}btn_download_pdf, mod_cv{{/str}}
                     </a>
+                    -->
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">
                             {{#str}}closebuttontitle{{/str}}
